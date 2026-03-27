@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Картошечный Скандал</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Динамический фон с плавным переходом */
+        .dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            transition: background 1.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        /* Альтернативные фоны-изображения (будут подгружаться при выборе в магазине) */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: -1;
+        }
+
+        .bg-image.active {
+            opacity: 1;
+        }
+
+        /* Главный контейнер */
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            margin: 12px;
+            scrollbar-width: thin;
+        }
+
+        /* Анимация приветствия */
+        .splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+            border-radius: 32px;
+        }
+
+        .splash-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.3);
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .splash-username {
+            font-size: 28px;
+            font-weight: 600;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 24px;
+            border-radius: 40px;
+            margin-bottom: 40px;
+        }
+
+        .register-panel {
+            background: rgba(30,30,40,0.9);
+            padding: 24px;
+            border-radius: 48px;
+            width: 80%;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .register-panel input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 32px;
+            border: none;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 16px;
+            background: #f2f2f6;
+        }
+
+        .ios-button {
+            background: #007aff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 32px;
+            font-weight: 600;
+            font-size: 18px;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .ios-button:active { transform: scale(0.97); background: #005fc5; }
+
+        /* Карточки и UI */
+        .stats-bar {
+            background: rgba(255,255,245,0.9);
+            margin: 16px;
+            padding: 16px;
+            border-radius: 48px;
+            display: flex;
+            justify-content: space-between;
+            backdrop-filter: blur(4px);
+            font-weight: 600;
+        }
+
+        .character-card {
+            background: rgba(255,255,245,0.95);
+            margin: 12px 16px;
+            padding: 16px;
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .character-emoji {
+            font-size: 48px;
+            background: #f3f3f5;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 35px;
+        }
+
+        .character-info {
+            flex: 1;
+        }
+
+        .click-area {
+            background: rgba(0,0,0,0.05);
+            margin: 8px 16px 20px;
+            padding: 24px;
+            border-radius: 60px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.05s linear;
+            backdrop-filter: blur(4px);
+        }
+        .click-area:active { transform: scale(0.98); background: rgba(0,0,0,0.1); }
+
+        .shop-item {
+            background: rgba(255,255,245,0.95);
+            margin: 10px 16px;
+            padding: 14px;
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .premium-badge {
+            background: #ffd700;
+            color: #8b6b00;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        button.buy-btn {
+            background: #34c759;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .leaderboard {
+            background: rgba(0,0,0,0.7);
+            margin: 16px;
+            border-radius: 32px;
+            padding: 12px;
+            color: white;
+        }
+
+        @media (max-width: 500px) {
+            .game-container { margin: 0; border-radius: 0; height: 100vh; width: 100%; max-width: 100%; }
+            .stats-bar { margin: 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="dynamic-bg" id="dynamicBg"></div>
+<div class="bg-image" id="bgImage"></div>
+<div class="game-container" id="gameContainer">
+    <!-- Сплаш/регистрация -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-avatar">🍟</div>
+        <div class="splash-username">@uglyctephan</div>
+        <div class="register-panel">
+            <input type="text" id="regUsername" placeholder="Твой никнейм" maxlength="20">
+            <button class="ios-button" id="startGameBtn">Войти в игру</button>
+        </div>
+    </div>
+
+    <!-- Основной интерфейс (скрыт сначала) -->
+    <div id="gameUI" style="display: none;">
+        <div class="stats-bar">
+            <span>🍟 <span id="fries">0</span></span>
+            <span>⭐ <span id="premium">0</span></span>
+            <span>⚡ <span id="clicksPerSec">0</span>/сек</span>
+        </div>
+
+        <div class="character-card">
+            <div class="character-emoji">🎀</div>
+            <div class="character-info">
+                <div><strong>Настикс</strong> — «одна фри на десятерых!»</div>
+                <div>💢 +<span id="clickPower">1</span> за тык</div>
+            </div>
+        </div>
+
+        <div class="click-area" id="clickArea">
+            🍟 ТЫКНИ ПО КАРТОШКЕ 🍟
+        </div>
+
+        <!-- Улучшения клика -->
+        <div class="shop-item">
+            <div><strong>➕ Улучшить клик</strong><br>💪 +<span id="nextClickBoost">0.5</span> к силе</div>
+            <button class="buy-btn" id="upgradeClickBtn">🍟 <span id="clickUpgradeCost">10</span></button>
+        </div>
+
+        <!-- Автокликеры -->
+        <div class="shop-item">
+            <div><strong>🤖 Дашикс-автокликер</strong><br>📈 +1 фри/сек</div>
+            <button class="buy-btn" id="buyAutoBtn">🍟 <span id="autoCost">50</span></button>
+        </div>
+
+        <!-- Премиум бустеры (временные) -->
+        <div class="shop-item">
+            <div><strong>⚡ 2x Клик (30 сек)</strong><br><span class="premium-badge">⭐ премиум</span></div>
+            <button class="buy-btn" id="buyX2Btn">⭐ 25</button>
+        </div>
+        <div class="shop-item">
+            <div><strong>⚡ 3x Клик (30 сек)</strong><br><span class="premium-badge">⭐ премиум</span></div>
+            <button class="buy-btn" id="buyX3Btn">⭐ 75</button>
+        </div>
+        <div class="shop-item">
+            <div><strong>⚡ Ускорение автокликеров x2 (30 сек)</strong></div>
+            <button class="buy-btn" id="boostAutoBtn">⭐ 50</button>
+        </div>
+
+        <!-- Магазин смены фона (изображения) -->
+        <div class="shop-item">
+            <div><strong>🎨 Фон "Розовый закат"</strong></div>
+            <button class="buy-btn" id="bg1Btn">🍟 500</button>
+        </div>
+        <div class="shop-item">
+            <div><strong>🎨 Фон "Красный вечер"</strong></div>
+            <button class="buy-btn" id="bg2Btn">🍟 500</button>
+        </div>
+        <div class="shop-item">
+            <div><strong>🎨 Фон "Синий океан"</strong></div>
+            <button class="buy-btn" id="bg3Btn">🍟 500</button>
+        </div>
+
+        <!-- Топ игроков -->
+        <div class="leaderboard" id="leaderboardDiv">
+            <strong>🏆 Топ тапальщиков 🏆</strong>
+            <div id="leaderboardList">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // -------- БАЗА ДАННЫХ localstorage ----------
+    let playersDB = JSON.parse(localStorage.getItem('clickerPlayers')) || {};
+    let currentUser = null;
+
+    // -------- СОСТОЯНИЕ ИГРЫ ----------
+    let gameState = {
+        fries: 0,
+        premium: 0,
+        clickPower: 1,
+        autoIncome: 0,
+        clickUpgradeLevel: 0,
+        autoUpgradeCount: 0,
+        activeMultiplier: 1,
+        multiplierEndTime: 0,
+        autoMultiplier: 1,
+        autoMultEndTime: 0
+    };
+
+    let upgradeCostBase = 10;
+    let autoCostBase = 50;
+    let lastTimestamp = Date.now();
+    let intervalId = null;
+
+    // Звук клика
+    const clickAudio = new Audio();
+    clickAudio.src = "data:audio/wav;base64,U3RlYWx0aCBzb3VuZA=="; // заглушка, но браузер может блокировать, просто имитируем вибрацию если надо
+
+    function playClickSound() {
+        // имитация звука через Web Audio (короткий пик)
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            oscillator.connect(gain);
+            gain.connect(audioCtx.destination);
+            oscillator.frequency.value = 800;
+            gain.gain.value = 0.1;
+            oscillator.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
+            oscillator.stop(audioCtx.currentTime + 0.2);
+            audioCtx.resume();
+        } catch(e) { /* тихо */ }
+    }
+
+    // Динамический фон (циклический розовый->красный->синий)
+    let bgCycle = 0;
+    const gradients = [
+        "radial-gradient(circle at 30% 10%, #ffb6c1, #ff69b4)",
+        "radial-gradient(circle at 70% 80%, #ff4d4d, #b22222)",
+        "radial-gradient(circle at 50% 50%, #4169e1, #00008b)"
+    ];
+    function updateDynamicBg() {
+        document.getElementById('dynamicBg').style.background = gradients[bgCycle % gradients.length];
+        bgCycle++;
+        setTimeout(() => updateDynamicBg(), 8000);
+    }
+    updateDynamicBg();
+
+    // Смена фона по картинкам (альтернативные, т.к. исходные битые, использую placeholder)
+    function setBackgroundImage(url) {
+        const imgDiv = document.getElementById('bgImage');
+        imgDiv.style.backgroundImage = `url(${url})`;
+        imgDiv.classList.add('active');
+        // убираем динамический фон временно, но оставляем
+        document.getElementById('dynamicBg').style.opacity = '0.3';
+    }
+    function resetToDynamic() {
+        document.getElementById('bgImage').classList.remove('active');
+        document.getElementById('dynamicBg').style.opacity = '1';
+    }
+
+    // заготовки ссылок (альтернативные красивые)
+    const bgImages = {
+        bg1: "https://picsum.photos/id/104/800/1200",   // розовое
+        bg2: "https://picsum.photos/id/155/800/1200",
+        bg3: "https://picsum.photos/id/96/800/1200"
+    };
+
+    // Сохранение в БД и обновление топа
+    function savePlayerData() {
+        if (!currentUser) return;
+        playersDB[currentUser] = {
+            username: currentUser,
+            totalFriesEarned: (playersDB[currentUser]?.totalFriesEarned || 0) + (gameState.fries - (playersDB[currentUser]?.lastFries || 0)),
+            lastFries: gameState.fries
+        };
+        // нормализация
+        if (!playersDB[currentUser].totalFriesEarned) playersDB[currentUser].totalFriesEarned = gameState.fries;
+        localStorage.setItem('clickerPlayers', JSON.stringify(playersDB));
+        updateLeaderboard();
+    }
+
+    function updateLeaderboard() {
+        const sorted = Object.values(playersDB).sort((a,b) => (b.totalFriesEarned||0) - (a.totalFriesEarned||0)).slice(0,8);
+        const listDiv = document.getElementById('leaderboardList');
+        if (listDiv) {
+            listDiv.innerHTML = sorted.map((p,idx) => `<div>${idx+1}. ${p.username} — 🍟 ${Math.floor(p.totalFriesEarned||0)}</div>`).join('');
+        }
+    }
+
+    // Пассивный доход
+    function updatePassiveIncome() {
+        const now = Date.now();
+        const deltaSec = Math.min(1, (now - lastTimestamp) / 1000);
+        if (deltaSec <= 0) return;
+        let income = gameState.autoIncome * deltaSec;
+        if (gameState.autoMultiplier > 1 && now < gameState.autoMultEndTime) income *= gameState.autoMultiplier;
+        if (income > 0) {
+            gameState.fries += income;
+            updateUI();
+        }
+        lastTimestamp = now;
+    }
+
+    function updateUI() {
+        document.getElementById('fries').innerText = Math.floor(gameState.fries);
+        document.getElementById('premium').innerText = Math.floor(gameState.premium);
+        document.getElementById('clicksPerSec').innerText = gameState.autoIncome;
+        document.getElementById('clickPower').innerText = gameState.clickPower;
+        let nextBoost = (gameState.clickUpgradeLevel + 1) * 0.5;
+        document.getElementById('nextClickBoost').innerText = nextBoost;
+        let nextClickCost = Math.floor(upgradeCostBase * Math.pow(1.6, gameState.clickUpgradeLevel));
+        document.getElementById('clickUpgradeCost').innerText = nextClickCost;
+        let nextAutoCost = Math.floor(autoCostBase * Math.pow(1.5, gameState.autoUpgradeCount));
+        document.getElementById('autoCost').innerText = nextAutoCost;
+        if (gameState.multiplierEndTime && Date.now() > gameState.multiplierEndTime) gameState.activeMultiplier = 1;
+        if (gameState.autoMultEndTime && Date.now() > gameState.autoMultEndTime) gameState.autoMultiplier = 1;
+    }
+
+    // Покупки
+    function buyClickUpgrade() {
+        let cost = Math.floor(upgradeCostBase * Math.pow(1.6, gameState.clickUpgradeLevel));
+        if (gameState.fries >= cost) {
+            gameState.fries -= cost;
+            gameState.clickUpgradeLevel++;
+            gameState.clickPower = 1 + gameState.clickUpgradeLevel * 0.5;
+            updateUI();
+            savePlayerData();
+        } else alert("Не хватает картошки!");
+    }
+
+    function buyAutoClicker() {
+        let cost = Math.floor(autoCostBase * Math.pow(1.5, gameState.autoUpgradeCount));
+        if (gameState.fries >= cost) {
+            gameState.fries -= cost;
+            gameState.autoUpgradeCount++;
+            gameState.autoIncome = gameState.autoUpgradeCount;
+            updateUI();
+            savePlayerData();
+        } else alert("Не хватает картошки!");
+    }
+
+    function clickHandler() {
+        let gain = gameState.clickPower;
+        if (Date.now() < gameState.multiplierEndTime) gain *= gameState.activeMultiplier;
+        gameState.fries += gain;
+        // премиум валюта (каждые 100 кликов +1 премиум)
+        let premiumGain = Math.floor(gain / 80);
+        if (premiumGain > 0) gameState.premium += premiumGain;
+        updateUI();
+        playClickSound();
+        savePlayerData();
+    }
+
+    // Премиум бустеры
+    function buyBooster(type) {
+        if (type === 'x2' && gameState.premium >= 25) {
+            gameState.premium -= 25;
+            gameState.activeMultiplier = 2;
+            gameState.multiplierEndTime = Date.now() + 30000;
+        } else if (type === 'x3' && gameState.premium >= 75) {
+            gameState.premium -= 75;
+            gameState.activeMultiplier = 3;
+            gameState.multiplierEndTime = Date.now() + 30000;
+        } else if (type === 'boostAuto' && gameState.premium >= 50) {
+            gameState.premium -= 50;
+            gameState.autoMultiplier = 2;
+            gameState.autoMultEndTime = Date.now() + 30000;
+        } else { alert("Недостаточно премиум валюты ⭐"); return; }
+        updateUI();
+        savePlayerData();
+    }
+
+    // Смена фона за картошку
+    function buyBackground(bgId) {
+        if (gameState.fries >= 500) {
+            gameState.fries -= 500;
+            if (bgId === 1) setBackgroundImage(bgImages.bg1);
+            else if (bgId === 2) setBackgroundImage(bgImages.bg2);
+            else if (bgId === 3) setBackgroundImage(bgImages.bg3);
+            updateUI();
+            savePlayerData();
+        } else alert("Нужно 500 картошки!");
+    }
+
+    // Инициализация игры после регистрации
+    function initGame(username) {
+        currentUser = username;
+        if (!playersDB[currentUser]) {
+            playersDB[currentUser] = { username, totalFriesEarned: 0, lastFries: 0 };
+        } else {
+            // восстановить состояние игрока из БД если было
+            gameState.fries = playersDB[currentUser]?.lastFries || 0;
+            // остальное оставляем по умолчанию, но можно донастроить
+        }
+        localStorage.setItem('clickerPlayers', JSON.stringify(playersDB));
+        updateLeaderboard();
+        lastTimestamp = Date.now();
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(() => {
+            updatePassiveIncome();
+            savePlayerData();
+        }, 500);
+        updateUI();
+        document.getElementById('splashScreen').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('splashScreen').style.display = 'none';
+            document.getElementById('gameUI').style.display = 'block';
+        }, 800);
+    }
+
+    // Обработчики событий
+    document.getElementById('startGameBtn').onclick = () => {
+        let nick = document.getElementById('regUsername').value.trim();
+        if (nick === "") nick = "Аноним";
+        initGame(nick);
+    };
+    document.getElementById('clickArea').onclick = clickHandler;
+    document.getElementById('upgradeClickBtn').onclick = buyClickUpgrade;
+    document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
+    document.getElementById('buyX2Btn').onclick = () => buyBooster('x2');
+    document.getElementById('buyX3Btn').onclick = () => buyBooster('x3');
+    document.getElementById('boostAutoBtn').onclick = () => buyBooster('boostAuto');
+    document.getElementById('bg1Btn').onclick = () => buyBackground(1);
+    document.getElementById('bg2Btn').onclick = () => buyBackground(2);
+    document.getElementById('bg3Btn').onclick = () => buyBackground(3);
+
+    // Динамическая подгрузка превью
+    updateLeaderboard();
+</script>
+</body>
+</html>
