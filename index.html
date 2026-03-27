@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Картошечный Скандал</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#f5a623">
+    <meta name="theme-color" content="#fcb69f">
     <style>
         * {
             margin: 0;
@@ -16,9 +16,8 @@
         }
 
         body {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f5a623;
-            transition: background 0.3s, font-family 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,17 +27,6 @@
             width: 100%;
             height: 100%;
         }
-
-        /* Темы */
-        body.theme-warm-yellow { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
-        body.theme-warm-green { background: linear-gradient(135deg, #e4f5d4, #b8e1a0); }
-        body.theme-cool-blue { background: linear-gradient(135deg, #d4e4ff, #a0c4ff); }
-
-        /* Шрифты */
-        body.font-normal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body.font-bold { font-family: 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-weight: bold; }
-        body.font-italic { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; }
-        body.font-bold-italic { font-family: 'Georgia', 'Times New Roman', serif; font-weight: bold; font-style: italic; }
 
         .app-container {
             width: 100%;
@@ -52,17 +40,15 @@
             position: relative;
         }
 
-        /* Главный экран */
         .screen {
             padding: 20px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
-
         .hidden { display: none; }
 
-        /* Картошка фри */
+        /* Главный экран */
         .fries-image {
             text-align: center;
             margin: 20px 0;
@@ -75,7 +61,16 @@
         }
         .fries-image span:active { transform: scale(0.96); }
 
-        /* Меню на главном */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.05);
+            padding: 15px;
+            border-radius: 30px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
         .main-menu {
             display: flex;
             justify-content: space-around;
@@ -95,19 +90,18 @@
         }
         .menu-btn:active { transform: scale(0.97); }
 
-        /* Карточки статистики */
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.05);
-            padding: 15px;
-            border-radius: 30px;
-            margin: 10px 0;
-            font-weight: bold;
+        .telegram-link {
+            background: #0088cc;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            margin-top: 20px;
+            cursor: pointer;
         }
 
-        /* Магазин, настройки, фудкорт */
-        .shop-item, .setting-item {
+        /* Магазин */
+        .shop-item {
             background: white;
             margin: 12px 0;
             padding: 15px;
@@ -130,35 +124,11 @@
             cursor: pointer;
         }
         button:active { transform: scale(0.96); }
-        .foodcourt-buttons {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .foodcourt-buttons button {
-            flex: 1;
-            background: #ff9500;
-        }
-        .message-area {
-            background: #e9ecef;
-            padding: 12px;
-            border-radius: 20px;
-            margin: 15px 0;
-            text-align: center;
-            font-size: 14px;
-        }
-        .telegram-link {
-            background: #0088cc;
-            color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: 40px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
+
+        h2 { margin-bottom: 15px; }
     </style>
 </head>
-<body class="theme-warm-yellow font-normal">
+<body>
 <div class="app-container">
     <!-- Главный экран -->
     <div id="mainScreen" class="screen">
@@ -169,7 +139,7 @@
             <span>🍟 <span id="fries">0</span></span>
             <span>⭐ <span id="premium">0</span></span>
             <span>⚡ <span id="clicksPerSec">0</span>/сек</span>
-            <span>📈 ур. <span id="tapLevel">1</span></span>
+            <span>💪 +<span id="clickPower">1</span></span>
         </div>
         <div class="main-menu">
             <button class="menu-btn" id="openShopBtn">🛒 магазин</button>
@@ -179,9 +149,9 @@
         <div class="telegram-link" id="telegramBtn">📱 наш Telegram канал</div>
     </div>
 
-    <!-- Магазин -->
+    <!-- Магазин (второй экран) -->
     <div id="shopScreen" class="screen hidden">
-        <h2>🛍️ магазин эффектов</h2>
+        <h2>🛍️ магазин</h2>
         <div class="shop-item" data-effect="crown">
             <div><span class="effect-badge">👑</span> летающие короны</div>
             <button class="buyEffectBtn">🍟 200</button>
@@ -195,41 +165,36 @@
             <button class="buyEffectBtn">🍟 500</button>
         </div>
         <div class="shop-item">
-            <div>🤖 автокликер (уровень <span id="autoLevel">0</span>)<br>📈 +<span id="autoIncome">0</span> карт/сек</div>
+            <div>🤖 автокликер<br>📈 уровень <span id="autoLevel">0</span> → +<span id="autoIncome">0</span>/сек</div>
             <button id="buyAutoBtn">🍟 <span id="autoCost">50</span></button>
         </div>
         <button id="backFromShop" class="menu-btn" style="margin-top:20px">← назад</button>
     </div>
 
-    <!-- Фудкорт -->
+    <!-- Фудкорт (заглушка) -->
     <div id="foodcourtScreen" class="screen hidden">
         <h2>🍽️ фудкорт</h2>
-        <div class="foodcourt-buttons">
-            <button id="jokeBtn">😂 смешно пошутить</button>
-            <button id="eatFriesBtn">🍟 съесть картошку</button>
+        <div class="shop-item">
+            <div>😂 смешно пошутить (раз в день)</div>
+            <button id="jokeBtn">+250🍟</button>
         </div>
-        <div id="foodcourtMessage" class="message-area">нажми на кнопку</div>
+        <div class="shop-item">
+            <div>🍟 съесть картошку (раз в 3 минуты)</div>
+            <button id="eatBtn">+1💪</button>
+        </div>
+        <div id="foodcourtMessage" class="stats" style="margin-top:15px">нажми на кнопку</div>
         <button id="backFromFoodcourt" class="menu-btn" style="margin-top:20px">← назад</button>
     </div>
 
-    <!-- Настройки -->
+    <!-- Настройки (заглушка) -->
     <div id="settingsScreen" class="screen hidden">
         <h2>⚙️ настройки</h2>
-        <div class="setting-item">
+        <div class="shop-item">
             <span>🎨 тема</span>
             <div>
                 <button id="themeYellow">жёлтая</button>
                 <button id="themeGreen">зелёная</button>
                 <button id="themeBlue">голубая</button>
-            </div>
-        </div>
-        <div class="setting-item">
-            <span>🔤 шрифт</span>
-            <div>
-                <button id="fontNormal">обычный</button>
-                <button id="fontBold">жирный</button>
-                <button id="fontItalic">курсив</button>
-                <button id="fontBoldItalic">жирный курсив</button>
             </div>
         </div>
         <button id="backFromSettings" class="menu-btn" style="margin-top:20px">← назад</button>
@@ -241,66 +206,44 @@
     let game = {
         fries: 100,
         premium: 0,
-        autoLevel: 0,
-        tapLevel: 1,
         clickPower: 1,
+        autoLevel: 0,
         autoIncome: 0,
         lastTimestamp: Date.now(),
-        jokeCooldown: 0,    // timestamp когда можно снова
-        eatCooldown: 0,
+        lastClickSound: 0,
         effects: {
             crown: false,
             fries: false,
             dollar: false
         },
-        autoCost: 50
+        jokeCooldown: 0,
+        eatCooldown: 0
     };
 
-    // Автокликер даёт: 1, 5, 10, 40...
+    // Прогрессия автокликера: 1 → 5 → 10 → 40
     const autoIncomeMap = [0, 1, 5, 10, 40];
     function updateAutoIncome() {
-        if (game.autoLevel >= autoIncomeMap.length) game.autoIncome = 40;
-        else game.autoIncome = autoIncomeMap[game.autoLevel];
+        game.autoIncome = autoIncomeMap[game.autoLevel] || 40;
         document.getElementById('autoIncome').innerText = game.autoIncome;
         document.getElementById('clicksPerSec').innerText = game.autoIncome;
         document.getElementById('autoLevel').innerText = game.autoLevel;
     }
 
-    // Стоимость автокликера растёт
     function getAutoCost() {
         return Math.floor(50 * Math.pow(1.8, game.autoLevel));
     }
 
-    // Пассивный доход
-    function updatePassiveIncome() {
-        const now = Date.now();
-        const delta = Math.min(0.5, (now - game.lastTimestamp) / 1000);
-        if (delta > 0) {
-            let gain = game.autoIncome * delta;
-            if (gain > 0) {
-                game.fries += gain;
-                updateUI();
-            }
-        }
-        game.lastTimestamp = now;
-    }
-
-    // Обновление интерфейса
     function updateUI() {
         document.getElementById('fries').innerText = Math.floor(game.fries);
         document.getElementById('premium').innerText = Math.floor(game.premium);
-        document.getElementById('tapLevel').innerText = game.tapLevel;
         document.getElementById('clickPower').innerText = game.clickPower;
         document.getElementById('autoCost').innerText = getAutoCost();
-        document.getElementById('autoLevel').innerText = game.autoLevel;
-        document.getElementById('autoIncome').innerText = game.autoIncome;
-        document.getElementById('clicksPerSec').innerText = game.autoIncome;
     }
 
-    // Сохранение
     function saveGame() {
         localStorage.setItem('clickerGame', JSON.stringify(game));
     }
+
     function loadGame() {
         const saved = localStorage.getItem('clickerGame');
         if (saved) {
@@ -313,19 +256,38 @@
         updateUI();
     }
 
-    // Клик по картошке
-    function clickHandler() {
-        let gain = game.clickPower;
-        game.fries += gain;
-        let premiumGain = Math.floor(gain / 80);
-        if (premiumGain > 0) game.premium += premiumGain;
-        updateUI();
-        playSound();
-        spawnParticles();
-        saveGame();
+    // Пассивный доход
+    function updatePassiveIncome() {
+        const now = Date.now();
+        const delta = Math.min(0.5, (now - game.lastTimestamp) / 1000);
+        if (delta > 0 && game.autoIncome > 0) {
+            game.fries += game.autoIncome * delta;
+            updateUI();
+        }
+        game.lastTimestamp = now;
     }
 
-    // Партиклы в зависимости от купленных эффектов
+    // Звук с таймаутом 1 сек
+    function playClickSound() {
+        const now = Date.now();
+        if (now - game.lastClickSound < 1000) return;
+        game.lastClickSound = now;
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 900;
+            gain.gain.value = 0.08;
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.12);
+            osc.stop(audioCtx.currentTime + 0.12);
+            audioCtx.resume();
+        } catch(e) {}
+    }
+
+    // Партиклы эффектов
     function spawnParticles() {
         const activeEffects = [];
         if (game.effects.crown) activeEffects.push('👑');
@@ -338,37 +300,32 @@
         particle.innerText = effect;
         particle.style.position = 'fixed';
         particle.style.left = Math.random() * window.innerWidth + 'px';
-        particle.style.bottom = '50px';
+        particle.style.bottom = '60px';
         particle.style.fontSize = '28px';
         particle.style.pointerEvents = 'none';
         particle.style.zIndex = '9999';
-        particle.style.transition = 'all 1s ease-out';
+        particle.style.transition = 'all 0.8s ease-out';
         document.body.appendChild(particle);
         requestAnimationFrame(() => {
-            particle.style.transform = 'translateY(-200px)';
+            particle.style.transform = 'translateY(-180px)';
             particle.style.opacity = '0';
         });
-        setTimeout(() => particle.remove(), 1000);
+        setTimeout(() => particle.remove(), 800);
     }
 
-    // Звук
-    function playSound() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = 800;
-            gain.gain.value = 0.05;
-            osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.1);
-            osc.stop(audioCtx.currentTime + 0.1);
-            audioCtx.resume();
-        } catch(e) {}
+    // Клик по картошке
+    function clickHandler() {
+        let gain = game.clickPower;
+        game.fries += gain;
+        let premiumGain = Math.floor(gain / 80);
+        if (premiumGain > 0) game.premium += premiumGain;
+        updateUI();
+        playClickSound();
+        spawnParticles();
+        saveGame();
     }
 
-    // ---------- ФУНКЦИИ МАГАЗИНА ----------
+    // ---------- МАГАЗИН ----------
     function buyEffect(effectName, price) {
         if (game.fries >= price) {
             game.fries -= price;
@@ -385,8 +342,7 @@
         let cost = getAutoCost();
         if (game.fries >= cost) {
             game.fries -= cost;
-            game.autoLevel++;
-            if (game.autoLevel > 4) game.autoLevel = 4;
+            if (game.autoLevel < 4) game.autoLevel++;
             updateAutoIncome();
             updateUI();
             saveGame();
@@ -399,8 +355,8 @@
     function makeJoke() {
         const now = Date.now();
         if (now < game.jokeCooldown) {
-            const minutes = Math.ceil((game.jokeCooldown - now) / 60000);
-            document.getElementById('foodcourtMessage').innerText = `⏰ шутить можно раз в день. осталось ${minutes} мин.`;
+            const hours = Math.ceil((game.jokeCooldown - now) / 3600000);
+            document.getElementById('foodcourtMessage').innerHTML = `⏰ шутить раз в день. осталось ~${hours} ч.`;
             return;
         }
         const isFunny = Math.random() < 0.5;
@@ -419,42 +375,28 @@
         const now = Date.now();
         if (now < game.eatCooldown) {
             const minutes = Math.ceil((game.eatCooldown - now) / 60000);
-            document.getElementById('foodcourtMessage').innerText = `⏰ съесть картошку можно раз в 3 минуты. осталось ${minutes} мин.`;
+            document.getElementById('foodcourtMessage').innerHTML = `⏰ съесть картошку раз в 3 минуты. осталось ${minutes} мин.`;
             return;
         }
-        game.tapLevel++;
-        game.clickPower = game.tapLevel;
-        document.getElementById('foodcourtMessage').innerHTML = `🍟 вкусно! уровень тапа повышен до ${game.tapLevel}`;
+        game.clickPower++;
+        document.getElementById('foodcourtMessage').innerHTML = `🍟 вкусно! сила клика +1 (теперь ${game.clickPower})`;
         game.eatCooldown = now + 3 * 60 * 1000;
         updateUI();
         saveGame();
     }
 
-    // ---------- НАСТРОЙКИ ----------
+    // ---------- НАСТРОЙКИ ТЕМ ----------
     function setTheme(theme) {
-        document.body.classList.remove('theme-warm-yellow', 'theme-warm-green', 'theme-cool-blue');
-        document.body.classList.add(`theme-${theme}`);
-        saveSettings();
+        const body = document.body;
+        if (theme === 'yellow') body.style.background = 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
+        if (theme === 'green') body.style.background = 'linear-gradient(135deg, #e4f5d4 0%, #b8e1a0 100%)';
+        if (theme === 'blue') body.style.background = 'linear-gradient(135deg, #d4e4ff 0%, #a0c4ff 100%)';
+        localStorage.setItem('gameTheme', theme);
     }
-    function setFont(font) {
-        document.body.classList.remove('font-normal', 'font-bold', 'font-italic', 'font-bold-italic');
-        document.body.classList.add(`font-${font}`);
-        saveSettings();
-    }
-    function saveSettings() {
-        const settings = {
-            theme: document.body.className.match(/theme-\w+/)?.[0] || 'theme-warm-yellow',
-            font: document.body.className.match(/font-\w+/)?.[0] || 'font-normal'
-        };
-        localStorage.setItem('gameSettings', JSON.stringify(settings));
-    }
-    function loadSettings() {
-        const saved = localStorage.getItem('gameSettings');
-        if (saved) {
-            const s = JSON.parse(saved);
-            if (s.theme) document.body.className = document.body.className.replace(/theme-\w+/, s.theme);
-            if (s.font) document.body.className = document.body.className.replace(/font-\w+/, s.font);
-        }
+
+    function loadTheme() {
+        const theme = localStorage.getItem('gameTheme');
+        if (theme) setTheme(theme);
     }
 
     // ---------- НАВИГАЦИЯ ----------
@@ -466,9 +408,10 @@
     // ---------- ИНИЦИАЛИЗАЦИЯ ----------
     window.onload = () => {
         loadGame();
-        loadSettings();
+        loadTheme();
         updateAutoIncome();
         updateUI();
+
         setInterval(() => {
             updatePassiveIncome();
             saveGame();
@@ -484,26 +427,23 @@
         // Магазин
         document.getElementById('backFromShop').onclick = () => showScreen('mainScreen');
         document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
-        document.querySelectorAll('.buyEffectBtn').forEach((btn, idx) => {
-            const effects = ['crown', 'fries', 'dollar'];
-            const prices = [200, 400, 500];
+        const effectBtns = document.querySelectorAll('.buyEffectBtn');
+        const effects = ['crown', 'fries', 'dollar'];
+        const prices = [200, 400, 500];
+        effectBtns.forEach((btn, idx) => {
             btn.onclick = () => buyEffect(effects[idx], prices[idx]);
         });
 
         // Фудкорт
         document.getElementById('backFromFoodcourt').onclick = () => showScreen('mainScreen');
         document.getElementById('jokeBtn').onclick = makeJoke;
-        document.getElementById('eatFriesBtn').onclick = eatFries;
+        document.getElementById('eatBtn').onclick = eatFries;
 
         // Настройки
         document.getElementById('backFromSettings').onclick = () => showScreen('mainScreen');
-        document.getElementById('themeYellow').onclick = () => setTheme('warm-yellow');
-        document.getElementById('themeGreen').onclick = () => setTheme('warm-green');
-        document.getElementById('themeBlue').onclick = () => setTheme('cool-blue');
-        document.getElementById('fontNormal').onclick = () => setFont('normal');
-        document.getElementById('fontBold').onclick = () => setFont('bold');
-        document.getElementById('fontItalic').onclick = () => setFont('italic');
-        document.getElementById('fontBoldItalic').onclick = () => setFont('bold-italic');
+        document.getElementById('themeYellow').onclick = () => setTheme('yellow');
+        document.getElementById('themeGreen').onclick = () => setTheme('green');
+        document.getElementById('themeBlue').onclick = () => setTheme('blue');
     };
 </script>
 </body>
