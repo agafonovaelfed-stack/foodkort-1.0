@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Картошечный Скандал</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#fcb69f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f5a623">
     <style>
         * {
             margin: 0;
@@ -18,8 +16,9 @@
         }
 
         body {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5a623;
+            transition: background 0.3s, font-family 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,169 +29,98 @@
             height: 100%;
         }
 
-        /* Главный контейнер (как iOS карточка) */
-        .game-container {
+        /* Темы */
+        body.theme-warm-yellow { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+        body.theme-warm-green { background: linear-gradient(135deg, #e4f5d4, #b8e1a0); }
+        body.theme-cool-blue { background: linear-gradient(135deg, #d4e4ff, #a0c4ff); }
+
+        /* Шрифты */
+        body.font-normal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body.font-bold { font-family: 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-weight: bold; }
+        body.font-italic { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; }
+        body.font-bold-italic { font-family: 'Georgia', 'Times New Roman', serif; font-weight: bold; font-style: italic; }
+
+        .app-container {
             width: 100%;
             max-width: 500px;
             height: 100vh;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            overflow-x: hidden;
             position: relative;
-            scrollbar-width: thin;
         }
 
-        /* Сплаш-экран с анимацией */
-        .splash-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #ffecd2, #fcb69f);
-            z-index: 200;
+        /* Главный экран */
+        .screen {
+            padding: 20px;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s ease;
         }
 
-        .splash-avatar {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-            margin-bottom: 24px;
-            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
-            animation: bounce 0.6s ease;
-        }
+        .hidden { display: none; }
 
-        @keyframes bounce {
-            0% { transform: scale(0.8); opacity: 0; }
-            80% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .splash-username {
-            font-size: 28px;
-            font-weight: 600;
-            color: white;
-            background: rgba(0,0,0,0.4);
-            padding: 8px 24px;
-            border-radius: 40px;
-            margin-bottom: 40px;
-        }
-
-        .register-panel {
-            background: rgba(255,255,245,0.95);
-            padding: 24px;
-            border-radius: 48px;
-            width: 80%;
+        /* Картошка фри */
+        .fries-image {
             text-align: center;
-            backdrop-filter: blur(8px);
+            margin: 20px 0;
         }
-
-        .register-panel input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 32px;
-            border: none;
-            font-size: 18px;
-            text-align: center;
-            margin-bottom: 16px;
-            background: #f2f2f6;
-        }
-
-        .ios-button {
-            background: #007aff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 32px;
-            font-weight: 600;
-            font-size: 18px;
-            color: white;
-            width: 100%;
+        .fries-image span {
+            font-size: 120px;
+            display: inline-block;
             cursor: pointer;
-            transition: 0.2s;
+            transition: transform 0.05s linear;
         }
-        .ios-button:active { transform: scale(0.97); background: #005fc5; }
+        .fries-image span:active { transform: scale(0.96); }
 
-        /* Интерфейс */
-        .stats-bar {
-            background: rgba(255,255,245,0.95);
-            margin: 16px;
-            padding: 16px;
-            border-radius: 48px;
+        /* Меню на главном */
+        .main-menu {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        .menu-btn {
+            background: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .menu-btn:active { transform: scale(0.97); }
+
+        /* Карточки статистики */
+        .stats {
             display: flex;
             justify-content: space-between;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-        }
-
-        .character-card {
-            background: rgba(255,255,245,0.96);
-            margin: 12px 16px;
-            padding: 16px;
-            border-radius: 32px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .character-emoji {
-            font-size: 48px;
-            background: #f3f3f5;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 35px;
-        }
-
-        .click-area {
-            background: rgba(0,0,0,0.06);
-            margin: 8px 16px 20px;
-            padding: 24px;
-            border-radius: 60px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.05s linear;
+            background: rgba(0,0,0,0.05);
+            padding: 15px;
+            border-radius: 30px;
+            margin: 10px 0;
             font-weight: bold;
-            font-size: 20px;
         }
-        .click-area:active { transform: scale(0.98); background: rgba(0,0,0,0.12); }
 
-        .shop-item {
-            background: rgba(255,255,245,0.96);
-            margin: 10px 16px;
-            padding: 14px;
+        /* Магазин, настройки, фудкорт */
+        .shop-item, .setting-item {
+            background: white;
+            margin: 12px 0;
+            padding: 15px;
             border-radius: 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .premium-badge {
-            background: #ffd700;
-            color: #8b6b00;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: bold;
+        .effect-badge {
+            font-size: 24px;
+            margin-right: 10px;
         }
-
-        button.buy-btn {
+        button {
             background: #34c759;
             border: none;
             padding: 8px 20px;
@@ -201,259 +129,382 @@
             color: white;
             cursor: pointer;
         }
-        button.buy-btn:active { transform: scale(0.96); }
-
-        .leaderboard {
-            background: rgba(0,0,0,0.75);
-            margin: 16px;
-            border-radius: 32px;
-            padding: 12px;
-            color: white;
-            margin-bottom: 30px;
+        button:active { transform: scale(0.96); }
+        .foodcourt-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
         }
-        @media (max-width: 500px) {
-            .game-container { margin: 0; border-radius: 0; height: 100vh; max-width: 100%; }
+        .foodcourt-buttons button {
+            flex: 1;
+            background: #ff9500;
+        }
+        .message-area {
+            background: #e9ecef;
+            padding: 12px;
+            border-radius: 20px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 14px;
+        }
+        .telegram-link {
+            background: #0088cc;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            margin-top: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
-<body>
-<div class="game-container" id="gameContainer">
-    <div class="splash-screen" id="splashScreen">
-        <div class="splash-avatar">🍟</div>
-        <div class="splash-username">@uglyctephan</div>
-        <div class="register-panel">
-            <input type="text" id="regUsername" placeholder="Твой никнейм" maxlength="20">
-            <button class="ios-button" id="startGameBtn">Войти в игру</button>
+<body class="theme-warm-yellow font-normal">
+<div class="app-container">
+    <!-- Главный экран -->
+    <div id="mainScreen" class="screen">
+        <div class="fries-image">
+            <span id="clickArea">🍟</span>
         </div>
-    </div>
-
-    <div id="gameUI" style="display: none;">
-        <div class="stats-bar">
+        <div class="stats">
             <span>🍟 <span id="fries">0</span></span>
             <span>⭐ <span id="premium">0</span></span>
             <span>⚡ <span id="clicksPerSec">0</span>/сек</span>
+            <span>📈 ур. <span id="tapLevel">1</span></span>
         </div>
+        <div class="main-menu">
+            <button class="menu-btn" id="openShopBtn">🛒 магазин</button>
+            <button class="menu-btn" id="openFoodcourtBtn">🍽️ фудкорт</button>
+            <button class="menu-btn" id="openSettingsBtn">⚙️ настройки</button>
+        </div>
+        <div class="telegram-link" id="telegramBtn">📱 наш Telegram канал</div>
+    </div>
 
-        <div class="character-card">
-            <div class="character-emoji">🎀</div>
-            <div class="character-info">
-                <div><strong>Настикс</strong> — «одна фри на десятерых!»</div>
-                <div>💢 +<span id="clickPower">1</span> за тык</div>
+    <!-- Магазин -->
+    <div id="shopScreen" class="screen hidden">
+        <h2>🛍️ магазин эффектов</h2>
+        <div class="shop-item" data-effect="crown">
+            <div><span class="effect-badge">👑</span> летающие короны</div>
+            <button class="buyEffectBtn">🍟 200</button>
+        </div>
+        <div class="shop-item" data-effect="fries">
+            <div><span class="effect-badge">🍟</span> летающая картошка</div>
+            <button class="buyEffectBtn">🍟 400</button>
+        </div>
+        <div class="shop-item" data-effect="dollar">
+            <div><span class="effect-badge">💵</span> летающие доллары</div>
+            <button class="buyEffectBtn">🍟 500</button>
+        </div>
+        <div class="shop-item">
+            <div>🤖 автокликер (уровень <span id="autoLevel">0</span>)<br>📈 +<span id="autoIncome">0</span> карт/сек</div>
+            <button id="buyAutoBtn">🍟 <span id="autoCost">50</span></button>
+        </div>
+        <button id="backFromShop" class="menu-btn" style="margin-top:20px">← назад</button>
+    </div>
+
+    <!-- Фудкорт -->
+    <div id="foodcourtScreen" class="screen hidden">
+        <h2>🍽️ фудкорт</h2>
+        <div class="foodcourt-buttons">
+            <button id="jokeBtn">😂 смешно пошутить</button>
+            <button id="eatFriesBtn">🍟 съесть картошку</button>
+        </div>
+        <div id="foodcourtMessage" class="message-area">нажми на кнопку</div>
+        <button id="backFromFoodcourt" class="menu-btn" style="margin-top:20px">← назад</button>
+    </div>
+
+    <!-- Настройки -->
+    <div id="settingsScreen" class="screen hidden">
+        <h2>⚙️ настройки</h2>
+        <div class="setting-item">
+            <span>🎨 тема</span>
+            <div>
+                <button id="themeYellow">жёлтая</button>
+                <button id="themeGreen">зелёная</button>
+                <button id="themeBlue">голубая</button>
             </div>
         </div>
-
-        <div class="click-area" id="clickArea">🍟 ТЫКНИ ПО КАРТОШКЕ 🍟</div>
-
-        <div class="shop-item">
-            <div><strong>➕ Улучшить клик</strong><br>💪 +<span id="nextClickBoost">0.5</span> к силе</div>
-            <button class="buy-btn" id="upgradeClickBtn">🍟 <span id="clickUpgradeCost">10</span></button>
+        <div class="setting-item">
+            <span>🔤 шрифт</span>
+            <div>
+                <button id="fontNormal">обычный</button>
+                <button id="fontBold">жирный</button>
+                <button id="fontItalic">курсив</button>
+                <button id="fontBoldItalic">жирный курсив</button>
+            </div>
         </div>
-
-        <div class="shop-item">
-            <div><strong>🤖 Дашикс-автокликер</strong><br>📈 +1 фри/сек</div>
-            <button class="buy-btn" id="buyAutoBtn">🍟 <span id="autoCost">50</span></button>
-        </div>
-
-        <div class="shop-item">
-            <div><strong>⚡ 2x Клик (30 сек)</strong><br><span class="premium-badge">⭐ премиум</span></div>
-            <button class="buy-btn" id="buyX2Btn">⭐ 25</button>
-        </div>
-        <div class="shop-item">
-            <div><strong>⚡ 3x Клик (30 сек)</strong><br><span class="premium-badge">⭐ премиум</span></div>
-            <button class="buy-btn" id="buyX3Btn">⭐ 75</button>
-        </div>
-        <div class="shop-item">
-            <div><strong>⚡ Ускорение автокликеров x2 (30 сек)</strong></div>
-            <button class="buy-btn" id="boostAutoBtn">⭐ 50</button>
-        </div>
-
-        <div class="leaderboard" id="leaderboardDiv">
-            <strong>🏆 Топ тапальщиков 🏆</strong>
-            <div id="leaderboardList">Загрузка...</div>
-        </div>
+        <button id="backFromSettings" class="menu-btn" style="margin-top:20px">← назад</button>
     </div>
 </div>
 
 <script>
-    // ---------- БАЗА ДАННЫХ ----------
-    let playersDB = JSON.parse(localStorage.getItem('clickerPlayers')) || {};
-    let currentUser = null;
-
-    // ---------- СОСТОЯНИЕ ИГРЫ ----------
-    let gameState = {
-        fries: 0,
+    // ---------- ИГРОВОЕ СОСТОЯНИЕ ----------
+    let game = {
+        fries: 100,
         premium: 0,
+        autoLevel: 0,
+        tapLevel: 1,
         clickPower: 1,
         autoIncome: 0,
-        clickUpgradeLevel: 0,
-        autoUpgradeCount: 0,
-        activeMultiplier: 1,
-        multiplierEndTime: 0,
-        autoMultiplier: 1,
-        autoMultEndTime: 0
+        lastTimestamp: Date.now(),
+        jokeCooldown: 0,    // timestamp когда можно снова
+        eatCooldown: 0,
+        effects: {
+            crown: false,
+            fries: false,
+            dollar: false
+        },
+        autoCost: 50
     };
 
-    let upgradeCostBase = 10;
-    let autoCostBase = 50;
-    let lastTimestamp = Date.now();
-    let intervalId = null;
+    // Автокликер даёт: 1, 5, 10, 40...
+    const autoIncomeMap = [0, 1, 5, 10, 40];
+    function updateAutoIncome() {
+        if (game.autoLevel >= autoIncomeMap.length) game.autoIncome = 40;
+        else game.autoIncome = autoIncomeMap[game.autoLevel];
+        document.getElementById('autoIncome').innerText = game.autoIncome;
+        document.getElementById('clicksPerSec').innerText = game.autoIncome;
+        document.getElementById('autoLevel').innerText = game.autoLevel;
+    }
 
-    // Звук клика
-    function playClickSound() {
+    // Стоимость автокликера растёт
+    function getAutoCost() {
+        return Math.floor(50 * Math.pow(1.8, game.autoLevel));
+    }
+
+    // Пассивный доход
+    function updatePassiveIncome() {
+        const now = Date.now();
+        const delta = Math.min(0.5, (now - game.lastTimestamp) / 1000);
+        if (delta > 0) {
+            let gain = game.autoIncome * delta;
+            if (gain > 0) {
+                game.fries += gain;
+                updateUI();
+            }
+        }
+        game.lastTimestamp = now;
+    }
+
+    // Обновление интерфейса
+    function updateUI() {
+        document.getElementById('fries').innerText = Math.floor(game.fries);
+        document.getElementById('premium').innerText = Math.floor(game.premium);
+        document.getElementById('tapLevel').innerText = game.tapLevel;
+        document.getElementById('clickPower').innerText = game.clickPower;
+        document.getElementById('autoCost').innerText = getAutoCost();
+        document.getElementById('autoLevel').innerText = game.autoLevel;
+        document.getElementById('autoIncome').innerText = game.autoIncome;
+        document.getElementById('clicksPerSec').innerText = game.autoIncome;
+    }
+
+    // Сохранение
+    function saveGame() {
+        localStorage.setItem('clickerGame', JSON.stringify(game));
+    }
+    function loadGame() {
+        const saved = localStorage.getItem('clickerGame');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                game = { ...game, ...data };
+                updateAutoIncome();
+            } catch(e) {}
+        }
+        updateUI();
+    }
+
+    // Клик по картошке
+    function clickHandler() {
+        let gain = game.clickPower;
+        game.fries += gain;
+        let premiumGain = Math.floor(gain / 80);
+        if (premiumGain > 0) game.premium += premiumGain;
+        updateUI();
+        playSound();
+        spawnParticles();
+        saveGame();
+    }
+
+    // Партиклы в зависимости от купленных эффектов
+    function spawnParticles() {
+        const activeEffects = [];
+        if (game.effects.crown) activeEffects.push('👑');
+        if (game.effects.fries) activeEffects.push('🍟');
+        if (game.effects.dollar) activeEffects.push('💵');
+        if (activeEffects.length === 0) return;
+
+        const effect = activeEffects[Math.floor(Math.random() * activeEffects.length)];
+        const particle = document.createElement('div');
+        particle.innerText = effect;
+        particle.style.position = 'fixed';
+        particle.style.left = Math.random() * window.innerWidth + 'px';
+        particle.style.bottom = '50px';
+        particle.style.fontSize = '28px';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '9999';
+        particle.style.transition = 'all 1s ease-out';
+        document.body.appendChild(particle);
+        requestAnimationFrame(() => {
+            particle.style.transform = 'translateY(-200px)';
+            particle.style.opacity = '0';
+        });
+        setTimeout(() => particle.remove(), 1000);
+    }
+
+    // Звук
+    function playSound() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.frequency.value = 1000;
-            gain.gain.value = 0.08;
+            osc.frequency.value = 800;
+            gain.gain.value = 0.05;
             osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
-            osc.stop(audioCtx.currentTime + 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.1);
+            osc.stop(audioCtx.currentTime + 0.1);
             audioCtx.resume();
-        } catch(e) { }
+        } catch(e) {}
     }
 
-    // Сохранение и топ
-    function savePlayerData() {
-        if (!currentUser) return;
-        let totalEarned = playersDB[currentUser]?.totalFriesEarned || 0;
-        let lastFries = playersDB[currentUser]?.lastFries || 0;
-        let earnedThisSession = Math.max(0, gameState.fries - lastFries);
-        playersDB[currentUser] = {
-            username: currentUser,
-            totalFriesEarned: (playersDB[currentUser]?.totalFriesEarned || 0) + earnedThisSession,
-            lastFries: gameState.fries
-        };
-        localStorage.setItem('clickerPlayers', JSON.stringify(playersDB));
-        updateLeaderboard();
-    }
-
-    function updateLeaderboard() {
-        const sorted = Object.values(playersDB).sort((a,b) => (b.totalFriesEarned||0) - (a.totalFriesEarned||0)).slice(0,8);
-        const listDiv = document.getElementById('leaderboardList');
-        if (listDiv) {
-            listDiv.innerHTML = sorted.map((p,idx) => `<div>${idx+1}. ${p.username} — 🍟 ${Math.floor(p.totalFriesEarned||0)}</div>`).join('');
-        }
-    }
-
-    function updatePassiveIncome() {
-        const now = Date.now();
-        const deltaSec = Math.min(0.5, (now - lastTimestamp) / 1000);
-        if (deltaSec <= 0) return;
-        let income = gameState.autoIncome * deltaSec;
-        if (gameState.autoMultiplier > 1 && now < gameState.autoMultEndTime) income *= gameState.autoMultiplier;
-        if (income > 0) {
-            gameState.fries += income;
+    // ---------- ФУНКЦИИ МАГАЗИНА ----------
+    function buyEffect(effectName, price) {
+        if (game.fries >= price) {
+            game.fries -= price;
+            game.effects[effectName] = true;
+            alert(`Эффект ${effectName} активирован!`);
             updateUI();
+            saveGame();
+        } else {
+            alert("Не хватает картошек!");
         }
-        lastTimestamp = now;
-    }
-
-    function updateUI() {
-        document.getElementById('fries').innerText = Math.floor(gameState.fries);
-        document.getElementById('premium').innerText = Math.floor(gameState.premium);
-        document.getElementById('clicksPerSec').innerText = gameState.autoIncome;
-        document.getElementById('clickPower').innerText = gameState.clickPower;
-        let nextBoost = (gameState.clickUpgradeLevel + 1) * 0.5;
-        document.getElementById('nextClickBoost').innerText = nextBoost;
-        let nextClickCost = Math.floor(upgradeCostBase * Math.pow(1.6, gameState.clickUpgradeLevel));
-        document.getElementById('clickUpgradeCost').innerText = nextClickCost;
-        let nextAutoCost = Math.floor(autoCostBase * Math.pow(1.5, gameState.autoUpgradeCount));
-        document.getElementById('autoCost').innerText = nextAutoCost;
-        if (gameState.multiplierEndTime && Date.now() > gameState.multiplierEndTime) gameState.activeMultiplier = 1;
-        if (gameState.autoMultEndTime && Date.now() > gameState.autoMultEndTime) gameState.autoMultiplier = 1;
-    }
-
-    function buyClickUpgrade() {
-        let cost = Math.floor(upgradeCostBase * Math.pow(1.6, gameState.clickUpgradeLevel));
-        if (gameState.fries >= cost) {
-            gameState.fries -= cost;
-            gameState.clickUpgradeLevel++;
-            gameState.clickPower = 1 + gameState.clickUpgradeLevel * 0.5;
-            updateUI();
-            savePlayerData();
-        } else alert("Не хватает картошки!");
     }
 
     function buyAutoClicker() {
-        let cost = Math.floor(autoCostBase * Math.pow(1.5, gameState.autoUpgradeCount));
-        if (gameState.fries >= cost) {
-            gameState.fries -= cost;
-            gameState.autoUpgradeCount++;
-            gameState.autoIncome = gameState.autoUpgradeCount;
+        let cost = getAutoCost();
+        if (game.fries >= cost) {
+            game.fries -= cost;
+            game.autoLevel++;
+            if (game.autoLevel > 4) game.autoLevel = 4;
+            updateAutoIncome();
             updateUI();
-            savePlayerData();
-        } else alert("Не хватает картошки!");
-    }
-
-    function clickHandler() {
-        let gain = gameState.clickPower;
-        if (Date.now() < gameState.multiplierEndTime) gain *= gameState.activeMultiplier;
-        gameState.fries += gain;
-        let premiumGain = Math.floor(gain / 70);
-        if (premiumGain > 0) gameState.premium += premiumGain;
-        updateUI();
-        playClickSound();
-        savePlayerData();
-    }
-
-    function buyBooster(type) {
-        if (type === 'x2' && gameState.premium >= 25) {
-            gameState.premium -= 25;
-            gameState.activeMultiplier = 2;
-            gameState.multiplierEndTime = Date.now() + 30000;
-        } else if (type === 'x3' && gameState.premium >= 75) {
-            gameState.premium -= 75;
-            gameState.activeMultiplier = 3;
-            gameState.multiplierEndTime = Date.now() + 30000;
-        } else if (type === 'boostAuto' && gameState.premium >= 50) {
-            gameState.premium -= 50;
-            gameState.autoMultiplier = 2;
-            gameState.autoMultEndTime = Date.now() + 30000;
-        } else { alert("Недостаточно ⭐"); return; }
-        updateUI();
-        savePlayerData();
-    }
-
-    function initGame(username) {
-        currentUser = username;
-        if (!playersDB[currentUser]) {
-            playersDB[currentUser] = { username, totalFriesEarned: 0, lastFries: 0 };
+            saveGame();
         } else {
-            gameState.fries = playersDB[currentUser]?.lastFries || 0;
+            alert("Не хватает картошек!");
         }
-        localStorage.setItem('clickerPlayers', JSON.stringify(playersDB));
-        updateLeaderboard();
-        lastTimestamp = Date.now();
-        if (intervalId) clearInterval(intervalId);
-        intervalId = setInterval(() => {
-            updatePassiveIncome();
-            savePlayerData();
-        }, 500);
-        updateUI();
-        document.getElementById('splashScreen').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('splashScreen').style.display = 'none';
-            document.getElementById('gameUI').style.display = 'block';
-        }, 800);
     }
 
-    // Привязка кнопок
-    document.getElementById('startGameBtn').onclick = () => {
-        let nick = document.getElementById('regUsername').value.trim();
-        if (nick === "") nick = "Аноним";
-        initGame(nick);
-    };
-    document.getElementById('clickArea').onclick = clickHandler;
-    document.getElementById('upgradeClickBtn').onclick = buyClickUpgrade;
-    document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
-    document.getElementById('buyX2Btn').onclick = () => buyBooster('x2');
-    document.getElementById('buyX3Btn').onclick = () => buyBooster('x3');
-    document.getElementById('boostAutoBtn').onclick = () => buyBooster('boostAuto');
+    // ---------- ФУДКОРТ ----------
+    function makeJoke() {
+        const now = Date.now();
+        if (now < game.jokeCooldown) {
+            const minutes = Math.ceil((game.jokeCooldown - now) / 60000);
+            document.getElementById('foodcourtMessage').innerText = `⏰ шутить можно раз в день. осталось ${minutes} мин.`;
+            return;
+        }
+        const isFunny = Math.random() < 0.5;
+        if (isFunny) {
+            game.fries += 250;
+            document.getElementById('foodcourtMessage').innerHTML = '😂 ха-ха! +250 картошек!';
+        } else {
+            document.getElementById('foodcourtMessage').innerHTML = '😐 ты не умеешь шутить, это не твое.';
+        }
+        game.jokeCooldown = now + 24 * 60 * 60 * 1000;
+        updateUI();
+        saveGame();
+    }
 
-    updateLeaderboard();
+    function eatFries() {
+        const now = Date.now();
+        if (now < game.eatCooldown) {
+            const minutes = Math.ceil((game.eatCooldown - now) / 60000);
+            document.getElementById('foodcourtMessage').innerText = `⏰ съесть картошку можно раз в 3 минуты. осталось ${minutes} мин.`;
+            return;
+        }
+        game.tapLevel++;
+        game.clickPower = game.tapLevel;
+        document.getElementById('foodcourtMessage').innerHTML = `🍟 вкусно! уровень тапа повышен до ${game.tapLevel}`;
+        game.eatCooldown = now + 3 * 60 * 1000;
+        updateUI();
+        saveGame();
+    }
+
+    // ---------- НАСТРОЙКИ ----------
+    function setTheme(theme) {
+        document.body.classList.remove('theme-warm-yellow', 'theme-warm-green', 'theme-cool-blue');
+        document.body.classList.add(`theme-${theme}`);
+        saveSettings();
+    }
+    function setFont(font) {
+        document.body.classList.remove('font-normal', 'font-bold', 'font-italic', 'font-bold-italic');
+        document.body.classList.add(`font-${font}`);
+        saveSettings();
+    }
+    function saveSettings() {
+        const settings = {
+            theme: document.body.className.match(/theme-\w+/)?.[0] || 'theme-warm-yellow',
+            font: document.body.className.match(/font-\w+/)?.[0] || 'font-normal'
+        };
+        localStorage.setItem('gameSettings', JSON.stringify(settings));
+    }
+    function loadSettings() {
+        const saved = localStorage.getItem('gameSettings');
+        if (saved) {
+            const s = JSON.parse(saved);
+            if (s.theme) document.body.className = document.body.className.replace(/theme-\w+/, s.theme);
+            if (s.font) document.body.className = document.body.className.replace(/font-\w+/, s.font);
+        }
+    }
+
+    // ---------- НАВИГАЦИЯ ----------
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+    window.onload = () => {
+        loadGame();
+        loadSettings();
+        updateAutoIncome();
+        updateUI();
+        setInterval(() => {
+            updatePassiveIncome();
+            saveGame();
+        }, 500);
+
+        // Главный экран
+        document.getElementById('clickArea').onclick = clickHandler;
+        document.getElementById('openShopBtn').onclick = () => showScreen('shopScreen');
+        document.getElementById('openFoodcourtBtn').onclick = () => showScreen('foodcourtScreen');
+        document.getElementById('openSettingsBtn').onclick = () => showScreen('settingsScreen');
+        document.getElementById('telegramBtn').onclick = () => window.open('https://t.me/hioly3', '_blank');
+
+        // Магазин
+        document.getElementById('backFromShop').onclick = () => showScreen('mainScreen');
+        document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
+        document.querySelectorAll('.buyEffectBtn').forEach((btn, idx) => {
+            const effects = ['crown', 'fries', 'dollar'];
+            const prices = [200, 400, 500];
+            btn.onclick = () => buyEffect(effects[idx], prices[idx]);
+        });
+
+        // Фудкорт
+        document.getElementById('backFromFoodcourt').onclick = () => showScreen('mainScreen');
+        document.getElementById('jokeBtn').onclick = makeJoke;
+        document.getElementById('eatFriesBtn').onclick = eatFries;
+
+        // Настройки
+        document.getElementById('backFromSettings').onclick = () => showScreen('mainScreen');
+        document.getElementById('themeYellow').onclick = () => setTheme('warm-yellow');
+        document.getElementById('themeGreen').onclick = () => setTheme('warm-green');
+        document.getElementById('themeBlue').onclick = () => setTheme('cool-blue');
+        document.getElementById('fontNormal').onclick = () => setFont('normal');
+        document.getElementById('fontBold').onclick = () => setFont('bold');
+        document.getElementById('fontItalic').onclick = () => setFont('italic');
+        document.getElementById('fontBoldItalic').onclick = () => setFont('bold-italic');
+    };
 </script>
 </body>
 </html>
