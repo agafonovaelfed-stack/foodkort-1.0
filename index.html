@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Картошечный Скандал</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2ecc71">
+    <meta name="theme-color" content="#000000">
     <style>
         * {
             margin: 0;
@@ -14,11 +14,9 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-
         body {
+            background: #000000;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #c6f7d0, #2ecc71);
-            transition: background 0.3s;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,8 +26,75 @@
             width: 100%;
             height: 100%;
         }
-
-        /* Контейнер с горизонтальным скроллом */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a472a, #0a2f1a);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        .splash-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 24px;
+            animation: bounce 0.6s ease;
+        }
+        @keyframes bounce {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .splash-username {
+            font-size: 28px;
+            font-weight: 600;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 24px;
+            border-radius: 40px;
+            margin-bottom: 40px;
+        }
+        .register-panel {
+            background: rgba(30,30,35,0.95);
+            padding: 24px;
+            border-radius: 48px;
+            width: 80%;
+            text-align: center;
+        }
+        .register-panel input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 32px;
+            border: none;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 16px;
+            background: #f2f2f6;
+        }
+        .ios-button {
+            background: #0a84ff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 32px;
+            font-weight: 600;
+            font-size: 18px;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+        }
+        .ios-button:active { transform: scale(0.97); }
         .scroll-container {
             width: 100%;
             max-width: 500px;
@@ -40,57 +105,62 @@
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
+            position: relative;
+            display: none;
         }
-
         .slide {
             display: inline-block;
             width: 100%;
             height: 100%;
             scroll-snap-align: start;
             vertical-align: top;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
             overflow-y: auto;
             padding: 20px;
             white-space: normal;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            color: white;
         }
-
-        /* Тапалка */
-        .fries-image {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .fries-image span {
-            font-size: 120px;
-            display: inline-block;
-            cursor: pointer;
-            transition: transform 0.05s linear;
-        }
-        .fries-image span:active { transform: scale(0.96); }
-
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.05);
-            padding: 15px;
-            border-radius: 30px;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-
-        /* Улучшение клика */
-        .upgrade-item {
-            background: white;
-            margin: 12px 0;
-            padding: 15px;
+        .stats-bar, .character-card, .shop-item, .setting-item, .message-area, .leaderboard {
+            background: rgba(30,30,35,0.9);
+            margin: 12px 16px;
+            padding: 16px;
             border-radius: 28px;
+            color: white;
+        }
+        .stats-bar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            font-weight: 600;
         }
-
+        .character-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .character-emoji {
+            font-size: 48px;
+            background: #1c1c1e;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 35px;
+        }
+        .click-area {
+            background: rgba(255,255,255,0.1);
+            margin: 8px 16px 20px;
+            padding: 24px;
+            border-radius: 60px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .click-area:active { transform: scale(0.98); background: rgba(255,255,255,0.2); }
         button {
-            background: #34c759;
+            background: #0a84ff;
             border: none;
             padding: 8px 20px;
             border-radius: 40px;
@@ -98,225 +168,295 @@
             color: white;
             cursor: pointer;
         }
-        button:active { transform: scale(0.96); }
-
-        /* Магазин, фудкорт, настройки */
-        .shop-item, .setting-item, .food-item {
-            background: white;
-            margin: 12px 0;
-            padding: 15px;
-            border-radius: 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .leaderboard {
+            margin-bottom: 30px;
         }
-        .effect-badge {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-        h2 { margin-bottom: 15px; }
+        h2 { margin-bottom: 15px; margin-top: 10px; margin-left: 16px; }
         .telegram-link {
-            background: #0088cc;
+            background: #0a84ff;
             color: white;
             text-align: center;
             padding: 12px;
             border-radius: 40px;
-            margin-top: 20px;
+            margin: 20px 16px;
             cursor: pointer;
         }
         .message-area {
-            background: #e9ecef;
-            padding: 12px;
-            border-radius: 20px;
-            margin: 15px 0;
+            margin: 15px 16px;
             text-align: center;
         }
+        .indicators {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 12px;
+            z-index: 100;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.5);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .indicator.active { background: white; width: 20px; }
     </style>
 </head>
 <body>
-<div class="scroll-container">
-    <!-- Слайд 0: тапалка -->
-    <div class="slide">
-        <div class="fries-image">
-            <span id="clickArea">🍟</span>
-        </div>
-        <div class="stats">
-            <span>🍟 <span id="fries">0</span></span>
-            <span>⭐ <span id="premium">0</span></span>
-            <span>⚡ <span id="clicksPerSec">0</span>/сек</span>
-            <span>💪 +<span id="clickPower">1</span></span>
-        </div>
-        <div class="upgrade-item">
-            <div>➕ улучшить клик<br>💪 +1 к силе</div>
-            <button id="upgradeClickBtn">🍟 <span id="clickUpgradeCost">10</span></button>
-        </div>
-        <div class="telegram-link" id="telegramBtn">📱 наш Telegram канал</div>
-    </div>
-
-    <!-- Слайд 1: магазин -->
-    <div class="slide">
-        <h2>🛍️ магазин</h2>
-        <div class="shop-item" data-effect="crown">
-            <div><span class="effect-badge">👑</span> летающие короны</div>
-            <button class="buyEffectBtn">🍟 200</button>
-        </div>
-        <div class="shop-item" data-effect="fries">
-            <div><span class="effect-badge">🍟</span> летающая картошка</div>
-            <button class="buyEffectBtn">🍟 400</button>
-        </div>
-        <div class="shop-item" data-effect="dollar">
-            <div><span class="effect-badge">💵</span> летающие доллары</div>
-            <button class="buyEffectBtn">🍟 500</button>
-        </div>
-        <div class="shop-item">
-            <div>🤖 автокликер (раз в 10 мин)<br>📈 уровень <span id="autoLevel">0</span> → <span id="autoIncome">0</span> 🍟</div>
-            <button id="buyAutoBtn">🍟 <span id="autoCost">50</span></button>
-        </div>
-    </div>
-
-    <!-- Слайд 2: фудкорт -->
-    <div class="slide">
-        <h2>🍽️ фудкорт</h2>
-        <div class="food-item">
-            <div>😂 смешно пошутить (раз в день)</div>
-            <button id="jokeBtn">+250🍟</button>
-        </div>
-        <div class="food-item">
-            <div>🍟 съесть картошку (раз в 3 мин)</div>
-            <button id="eatBtn">+1💪</button>
-        </div>
-        <div id="foodcourtMessage" class="message-area">нажми на кнопку</div>
-    </div>
-
-    <!-- Слайд 3: настройки -->
-    <div class="slide">
-        <h2>⚙️ настройки</h2>
-        <div class="setting-item">
-            <span>🎨 тема</span>
-            <div>
-                <button id="themeEmerald">изумрудная</button>
-                <button id="themeYellow">жёлтая</button>
-                <button id="themeBlue">голубая</button>
-            </div>
-        </div>
-        <div class="setting-item">
-            <span>✨ партиклы</span>
-            <div>
-                <button id="particlesOn">вкл</button>
-                <button id="particlesOff">выкл</button>
-            </div>
-        </div>
+<div class="splash-screen" id="splashScreen">
+    <div class="splash-avatar">🍟</div>
+    <div class="splash-username">@uglyctephan</div>
+    <div class="register-panel">
+        <input type="text" id="regUsername" placeholder="Твой никнейм" maxlength="20">
+        <button class="ios-button" id="startGameBtn">Войти в игру</button>
     </div>
 </div>
 
+<div class="scroll-container" id="scrollContainer">
+    <!-- Слайд 0: тапалка -->
+    <div class="slide">
+        <div class="stats-bar">
+            <span>🍟 <span id="fries">0</span></span>
+            <span>⚡ <span id="clicksPerSec">0</span>/сек</span>
+        </div>
+        <div class="character-card">
+            <div class="character-emoji">🎀</div>
+            <div class="character-info">
+                <div><strong id="charName">Настикс</strong> <span id="charQuote">— «одна фри на десятерых!»</span></div>
+                <div>💢 +<span id="clickPower">1</span> <span id="perClickText">за тык</span></div>
+            </div>
+        </div>
+        <div class="click-area" id="clickArea">🍟 <span id="clickBtnText">ТЫКНИ ПО КАРТОШКЕ</span> 🍟</div>
+        <div class="shop-item">
+            <div><span id="upgradeTitle">➕ Улучшить клик</span><br>💪 +0.5 <span id="toPowerText">к силе</span></div>
+            <button id="upgradeClickBtn">🍟 <span id="clickUpgradeCost">10</span></button>
+        </div>
+        <div class="shop-item">
+            <div><span id="autoTitle">🤖 Дашикс-автокликер</span><br>📈 +1 <span id="perSecText">фри/сек</span></div>
+            <button id="buyAutoBtn">🍟 <span id="autoCost">50</span></button>
+        </div>
+        <div class="shop-item">
+            <div><span id="booster2xTitle">⚡ 2x Клик (30 сек)</span></div>
+            <button id="buyX2Btn">🍟 100</button>
+        </div>
+        <div class="shop-item">
+            <div><span id="booster3xTitle">⚡ 3x Клик (30 сек)</span></div>
+            <button id="buyX3Btn">🍟 250</button>
+        </div>
+        <div class="shop-item">
+            <div><span id="boostAutoTitle">⚡ Ускорение автокликеров x2 (30 сек)</span></div>
+            <button id="boostAutoBtn">🍟 150</button>
+        </div>
+        <div class="leaderboard" id="leaderboardDiv">
+            <strong>🏆 <span id="topTitle">Топ тапальщиков</span> 🏆</strong>
+            <div id="leaderboardList">Загрузка...</div>
+        </div>
+    </div>
+
+    <!-- Слайд 1: магазин + фудкорт + настройки -->
+    <div class="slide">
+        <h2 id="shopTitle">🛍️ магазин</h2>
+        <div class="shop-item">
+            <div><span id="friesEffectTitle">🍟 летающие картошки (эффект)</span></div>
+            <button id="buyFriesEffect">🍟 500</button>
+        </div>
+
+        <h2 id="foodcourtTitle">🍽️ фудкорт</h2>
+        <div class="shop-item">
+            <div><span id="jokeTitle">😂 смешно пошутить (раз в день)</span></div>
+            <button id="jokeBtn">+250🍟</button>
+        </div>
+        <div class="shop-item">
+            <div><span id="eatTitle">🍟 съесть картошку (раз в 3 мин)</span></div>
+            <button id="eatBtn">+1💪</button>
+        </div>
+        <div id="foodcourtMessage" class="message-area"><span id="pressBtnText">нажми на кнопку</span></div>
+
+        <h2 id="settingsTitle">⚙️ настройки</h2>
+        <div class="setting-item">
+            <span>🌍 <span id="langText">язык</span></span>
+            <div>
+                <button id="langRu">русский</button>
+                <button id="langEn">english</button>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span>🔊 <span id="soundText">звук</span></span>
+            <div>
+                <button id="soundOn"><span id="onText">вкл</span></button>
+                <button id="soundOff"><span id="offText">выкл</span></button>
+            </div>
+        </div>
+        <div class="telegram-link" id="telegramBtn">📱 <span id="tgText">наш Telegram канал</span></div>
+    </div>
+</div>
+
+<div class="indicators" id="indicators">
+    <div class="indicator active" data-slide="0"></div>
+    <div class="indicator" data-slide="1"></div>
+</div>
+
 <script>
-    // ---------- ИГРОВОЕ СОСТОЯНИЕ ----------
-    let game = {
-        fries: 100,
-        premium: 0,
-        clickPower: 1,
-        clickUpgradeLevel: 0,
-        autoLevel: 0,
-        autoIncomeValue: 0,
-        lastAutoTime: 0,
-        effects: { crown: false, fries: false, dollar: false },
-        particlesEnabled: true,
-        jokeCooldown: 0,
-        eatCooldown: 0
+    // Локализация
+    const langData = {
+        ru: {
+            charName: "Настикс", charQuote: "— «одна фри на десятерых!»", perClick: "за тык",
+            clickBtn: "ТЫКНИ ПО КАРТОШКЕ", upgrade: "➕ Улучшить клик", toPower: "к силе",
+            auto: "🤖 Дашикс-автокликер", perSec: "фри/сек", booster2x: "⚡ 2x Клик (30 сек)",
+            booster3x: "⚡ 3x Клик (30 сек)", boostAuto: "⚡ Ускорение автокликеров x2 (30 сек)",
+            top: "Топ тапальщиков", shop: "🛍️ магазин", friesEffect: "🍟 летающие картошки (эффект)",
+            foodcourt: "🍽️ фудкорт", joke: "😂 смешно пошутить (раз в день)", eat: "🍟 съесть картошку (раз в 3 мин)",
+            press: "нажми на кнопку", settings: "⚙️ настройки", lang: "язык", sound: "звук", on: "вкл", off: "выкл", tg: "наш Telegram канал",
+            jokeSuccess: "😂 ха-ха! +250 картошек!", jokeFail: "😐 ты не умеешь шутить, это не твое.",
+            eatMsg: (power) => `🍟 вкусно! сила клика +1 (теперь ${power})`,
+            cooldownJoke: (h) => `⏰ шутить раз в день. осталось ~${h} ч.`,
+            cooldownEat: (m) => `⏰ съесть картошку раз в 3 минуты. осталось ${m} мин.`,
+            effectBought: "🍟 эффект летающих картошек куплен!"
+        },
+        en: {
+            charName: "Nastix", charQuote: "— one fries for ten people!", perClick: "per tap",
+            clickBtn: "TAP THE FRIES", upgrade: "➕ Upgrade click", toPower: "to power",
+            auto: "🤖 Dashix autoclicker", perSec: "fries/sec", booster2x: "⚡ 2x Click (30 sec)",
+            booster3x: "⚡ 3x Click (30 sec)", boostAuto: "⚡ Autoclicker boost x2 (30 sec)",
+            top: "Top tappers", shop: "🛍️ shop", friesEffect: "🍟 flying fries (effect)",
+            foodcourt: "🍽️ food court", joke: "😂 tell a joke (once a day)", eat: "🍟 eat fries (once per 3 min)",
+            press: "press the button", settings: "⚙️ settings", lang: "language", sound: "sound", on: "on", off: "off", tg: "our Telegram channel",
+            jokeSuccess: "😂 haha! +250 fries!", jokeFail: "😐 you can't joke, not your thing.",
+            eatMsg: (power) => `🍟 tasty! click power +1 (now ${power})`,
+            cooldownJoke: (h) => `⏰ joke once a day. ${h} hours left.`,
+            cooldownEat: (m) => `⏰ eat fries once per 3 min. ${m} min left.`,
+            effectBought: "🍟 flying fries effect purchased!"
+        }
     };
+    let currentLang = 'ru';
 
-    const upgradeCostBase = 10;
-    const autoIncomeMap = [0, 1, 5, 10, 40];
-    const autoCostBase = 50;
+    let playersDB = JSON.parse(localStorage.getItem('clickerPlayers')) || {};
+    let currentUser = null;
+    let gameState = {
+        fries: 0,
+        clickPower: 1,
+        autoIncome: 0,
+        clickUpgradeLevel: 0,
+        autoUpgradeCount: 0,
+        activeMultiplier: 1, multiplierEndTime: 0,
+        autoMultiplier: 1, autoMultEndTime: 0,
+        soundEnabled: true, jokeCooldown: 0, eatCooldown: 0,
+        friesEffect: false
+    };
+    let upgradeCostBase = 10, autoCostBase = 50, lastTimestamp = Date.now(), intervalId = null;
 
-    function getClickUpgradeCost() {
-        return Math.floor(upgradeCostBase * Math.pow(1.6, game.clickUpgradeLevel));
-    }
-
-    function getAutoCost() {
-        return Math.floor(autoCostBase * Math.pow(1.8, game.autoLevel));
+    function applyLanguage() {
+        const d = langData[currentLang];
+        document.getElementById('charName').innerText = d.charName;
+        document.getElementById('charQuote').innerText = d.charQuote;
+        document.getElementById('perClickText').innerText = d.perClick;
+        document.getElementById('clickBtnText').innerText = d.clickBtn;
+        document.getElementById('upgradeTitle').innerHTML = d.upgrade;
+        document.getElementById('toPowerText').innerText = d.toPower;
+        document.getElementById('autoTitle').innerHTML = d.auto;
+        document.getElementById('perSecText').innerText = d.perSec;
+        document.getElementById('booster2xTitle').innerHTML = d.booster2x;
+        document.getElementById('booster3xTitle').innerHTML = d.booster3x;
+        document.getElementById('boostAutoTitle').innerHTML = d.boostAuto;
+        document.getElementById('topTitle').innerText = d.top;
+        document.getElementById('shopTitle').innerText = d.shop;
+        document.getElementById('friesEffectTitle').innerHTML = d.friesEffect;
+        document.getElementById('foodcourtTitle').innerText = d.foodcourt;
+        document.getElementById('jokeTitle').innerHTML = d.joke;
+        document.getElementById('eatTitle').innerHTML = d.eat;
+        document.getElementById('pressBtnText').innerText = d.press;
+        document.getElementById('settingsTitle').innerText = d.settings;
+        document.getElementById('langText').innerText = d.lang;
+        document.getElementById('soundText').innerText = d.sound;
+        document.getElementById('onText').innerText = d.on;
+        document.getElementById('offText').innerText = d.off;
+        document.getElementById('tgText').innerText = d.tg;
     }
 
     function updateUI() {
-        document.getElementById('fries').innerText = Math.floor(game.fries);
-        document.getElementById('premium').innerText = Math.floor(game.premium);
-        document.getElementById('clickPower').innerText = game.clickPower;
-        document.getElementById('clickUpgradeCost').innerText = getClickUpgradeCost();
-        document.getElementById('autoLevel').innerText = game.autoLevel;
-        document.getElementById('autoIncome').innerText = autoIncomeMap[game.autoLevel] || 40;
-        document.getElementById('autoCost').innerText = getAutoCost();
-        document.getElementById('clicksPerSec').innerText = 'авто';
+        document.getElementById('fries').innerText = Math.floor(gameState.fries);
+        document.getElementById('clicksPerSec').innerText = gameState.autoIncome;
+        document.getElementById('clickPower').innerText = gameState.clickPower;
+        document.getElementById('clickUpgradeCost').innerText = Math.floor(upgradeCostBase * Math.pow(1.6, gameState.clickUpgradeLevel));
+        document.getElementById('autoCost').innerText = Math.floor(autoCostBase * Math.pow(1.5, gameState.autoUpgradeCount));
+        if (gameState.multiplierEndTime && Date.now() > gameState.multiplierEndTime) gameState.activeMultiplier = 1;
+        if (gameState.autoMultEndTime && Date.now() > gameState.autoMultEndTime) gameState.autoMultiplier = 1;
     }
 
     function saveGame() {
-        localStorage.setItem('clickerGame', JSON.stringify(game));
+        if (!currentUser) return;
+        playersDB[currentUser] = {
+            username: currentUser,
+            totalFriesEarned: (playersDB[currentUser]?.totalFriesEarned || 0) + Math.max(0, gameState.fries - (playersDB[currentUser]?.lastFries || 0)),
+            lastFries: gameState.fries
+        };
+        localStorage.setItem('clickerPlayers', JSON.stringify(playersDB));
+        localStorage.setItem('clickerState', JSON.stringify({
+            soundEnabled: gameState.soundEnabled, lang: currentLang,
+            jokeCooldown: gameState.jokeCooldown, eatCooldown: gameState.eatCooldown,
+            friesEffect: gameState.friesEffect
+        }));
+        updateLeaderboard();
     }
 
-    function loadGame() {
-        const saved = localStorage.getItem('clickerGame');
+    function loadExt() {
+        const saved = localStorage.getItem('clickerState');
         if (saved) {
-            try {
-                const data = JSON.parse(saved);
-                game = { ...game, ...data };
-                if (!game.autoLevel) game.autoLevel = 0;
-                if (!game.effects) game.effects = { crown: false, fries: false, dollar: false };
-            } catch(e) {}
+            const d = JSON.parse(saved);
+            gameState.soundEnabled = d.soundEnabled !== undefined ? d.soundEnabled : true;
+            if (d.lang) currentLang = d.lang;
+            gameState.jokeCooldown = d.jokeCooldown || 0;
+            gameState.eatCooldown = d.eatCooldown || 0;
+            gameState.friesEffect = d.friesEffect || false;
         }
-        updateUI();
+        applyLanguage();
     }
 
-    // Автокликер раз в 10 минут
-    function checkAutoClicker() {
+    function updateLeaderboard() {
+        const sorted = Object.values(playersDB).sort((a,b) => (b.totalFriesEarned||0) - (a.totalFriesEarned||0)).slice(0,8);
+        document.getElementById('leaderboardList').innerHTML = sorted.map((p,i) => `<div>${i+1}. ${p.username} — 🍟 ${Math.floor(p.totalFriesEarned||0)}</div>`).join('');
+    }
+
+    function updatePassive() {
         const now = Date.now();
-        if (game.autoLevel > 0 && (now - game.lastAutoTime) >= 10 * 60 * 1000) {
-            let reward = autoIncomeMap[game.autoLevel] || 40;
-            game.fries += reward;
-            game.lastAutoTime = now;
+        const delta = Math.min(0.5, (now - lastTimestamp) / 1000);
+        if (delta > 0) {
+            let income = gameState.autoIncome * delta;
+            if (gameState.autoMultiplier > 1 && now < gameState.autoMultEndTime) income *= gameState.autoMultiplier;
+            if (income > 0) gameState.fries += income;
+            lastTimestamp = now;
             updateUI();
-            saveGame();
-            showFloatingText(`🤖 автокликер: +${reward} 🍟`);
         }
     }
-    setInterval(checkAutoClicker, 1000);
 
-    function showFloatingText(text) {
-        const div = document.createElement('div');
-        div.innerText = text;
-        div.style.position = 'fixed';
-        div.style.bottom = '30%';
-        div.style.left = '50%';
-        div.style.transform = 'translateX(-50%)';
-        div.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        div.style.color = 'white';
-        div.style.padding = '8px 16px';
-        div.style.borderRadius = '40px';
-        div.style.fontSize = '14px';
-        div.style.zIndex = '9999';
-        div.style.whiteSpace = 'nowrap';
-        document.body.appendChild(div);
-        setTimeout(() => div.remove(), 1500);
+    function playSound() {
+        if (!gameState.soundEnabled) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 1000;
+            gain.gain.value = 0.08;
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15);
+            osc.stop(ctx.currentTime + 0.15);
+            ctx.resume();
+        } catch(e) {}
     }
 
-    // Партиклы
-    function spawnParticles() {
-        if (!game.particlesEnabled) return;
-        const active = [];
-        if (game.effects.crown) active.push('👑');
-        if (game.effects.fries) active.push('🍟');
-        if (game.effects.dollar) active.push('💵');
-        if (active.length === 0) return;
-
-        const effect = active[Math.floor(Math.random() * active.length)];
+    function spawnFriesEffect() {
+        if (!gameState.friesEffect) return;
         const particle = document.createElement('div');
-        particle.innerText = effect;
-        particle.style.position = 'fixed';
-        particle.style.left = Math.random() * window.innerWidth + 'px';
-        particle.style.bottom = '60px';
-        particle.style.fontSize = '28px';
-        particle.style.opacity = '0.5';
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '9999';
-        particle.style.transition = 'all 1s ease-out';
+        particle.innerText = '🍟';
+        particle.style.cssText = `position:fixed;left:${Math.random() * window.innerWidth}px;bottom:60px;font-size:28px;opacity:0.6;pointer-events:none;z-index:9999;transition:all 1s ease-out;`;
         document.body.appendChild(particle);
         requestAnimationFrame(() => {
             particle.style.transform = 'translateY(-200px)';
@@ -325,157 +465,150 @@
         setTimeout(() => particle.remove(), 1000);
     }
 
-    // Звук с таймаутом
-    let lastSound = 0;
-    function playClickSound() {
-        const now = Date.now();
-        if (now - lastSound < 1000) return;
-        lastSound = now;
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = 900;
-            gain.gain.value = 0.08;
-            osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.12);
-            osc.stop(audioCtx.currentTime + 0.12);
-            audioCtx.resume();
-        } catch(e) {}
-    }
-
-    // Клик
     function clickHandler() {
-        let gain = game.clickPower;
-        game.fries += gain;
-        let premiumGain = Math.floor(gain / 80);
-        if (premiumGain > 0) game.premium += premiumGain;
+        let gain = gameState.clickPower;
+        if (Date.now() < gameState.multiplierEndTime) gain *= gameState.activeMultiplier;
+        gameState.fries += gain;
         updateUI();
-        playClickSound();
-        spawnParticles();
+        playSound();
+        spawnFriesEffect();
         saveGame();
     }
 
-    // Улучшение клика
-    function upgradeClick() {
-        let cost = getClickUpgradeCost();
-        if (game.fries >= cost) {
-            game.fries -= cost;
-            game.clickUpgradeLevel++;
-            game.clickPower = 1 + game.clickUpgradeLevel;
+    function buyClickUpgrade() {
+        let cost = Math.floor(upgradeCostBase * Math.pow(1.6, gameState.clickUpgradeLevel));
+        if (gameState.fries >= cost) {
+            gameState.fries -= cost;
+            gameState.clickUpgradeLevel++;
+            gameState.clickPower = 1 + gameState.clickUpgradeLevel * 0.5;
             updateUI();
             saveGame();
-        } else alert("Не хватает картошек!");
+        } else alert("Не хватает картошки!");
     }
 
-    // Покупка эффектов
-    function buyEffect(effectName, price) {
-        if (game.fries >= price) {
-            game.fries -= price;
-            game.effects[effectName] = true;
-            alert(`Эффект ${effectName} куплен!`);
-            updateUI();
-            saveGame();
-        } else alert("Не хватает картошек!");
-    }
-
-    // Покупка автокликера
     function buyAutoClicker() {
-        let cost = getAutoCost();
-        if (game.fries >= cost) {
-            game.fries -= cost;
-            if (game.autoLevel < 4) game.autoLevel++;
+        let cost = Math.floor(autoCostBase * Math.pow(1.5, gameState.autoUpgradeCount));
+        if (gameState.fries >= cost) {
+            gameState.fries -= cost;
+            gameState.autoUpgradeCount++;
+            gameState.autoIncome = gameState.autoUpgradeCount;
             updateUI();
             saveGame();
-            if (game.autoLevel === 1) game.lastAutoTime = Date.now();
+        } else alert("Не хватает картошки!");
+    }
+
+    function buyBooster(type) {
+        if (type === 'x2' && gameState.fries >= 100) {
+            gameState.fries -= 100;
+            gameState.activeMultiplier = 2;
+            gameState.multiplierEndTime = Date.now() + 30000;
+        } else if (type === 'x3' && gameState.fries >= 250) {
+            gameState.fries -= 250;
+            gameState.activeMultiplier = 3;
+            gameState.multiplierEndTime = Date.now() + 30000;
+        } else if (type === 'boostAuto' && gameState.fries >= 150) {
+            gameState.fries -= 150;
+            gameState.autoMultiplier = 2;
+            gameState.autoMultEndTime = Date.now() + 30000;
+        } else { alert("Не хватает картошек!"); return; }
+        updateUI();
+        saveGame();
+    }
+
+    function buyFriesEffect() {
+        if (gameState.fries >= 500) {
+            gameState.fries -= 500;
+            gameState.friesEffect = true;
+            alert(langData[currentLang].effectBought);
+            updateUI();
+            saveGame();
         } else alert("Не хватает картошек!");
     }
 
-    // Фудкорт
     function makeJoke() {
         const now = Date.now();
-        if (now < game.jokeCooldown) {
-            const hours = Math.ceil((game.jokeCooldown - now) / 3600000);
-            document.getElementById('foodcourtMessage').innerHTML = `⏰ шутить раз в день. осталось ~${hours} ч.`;
+        if (now < gameState.jokeCooldown) {
+            const h = Math.ceil((gameState.jokeCooldown - now) / 3600000);
+            document.getElementById('foodcourtMessage').innerHTML = langData[currentLang].cooldownJoke(h);
             return;
         }
-        const isFunny = Math.random() < 0.5;
-        if (isFunny) {
-            game.fries += 250;
-            document.getElementById('foodcourtMessage').innerHTML = '😂 ха-ха! +250 картошек!';
+        const funny = Math.random() < 0.5;
+        if (funny) {
+            gameState.fries += 250;
+            document.getElementById('foodcourtMessage').innerHTML = langData[currentLang].jokeSuccess;
         } else {
-            document.getElementById('foodcourtMessage').innerHTML = '😐 ты не умеешь шутить, это не твое.';
+            document.getElementById('foodcourtMessage').innerHTML = langData[currentLang].jokeFail;
         }
-        game.jokeCooldown = now + 24 * 60 * 60 * 1000;
+        gameState.jokeCooldown = now + 24 * 60 * 60 * 1000;
         updateUI();
         saveGame();
     }
 
     function eatFries() {
         const now = Date.now();
-        if (now < game.eatCooldown) {
-            const minutes = Math.ceil((game.eatCooldown - now) / 60000);
-            document.getElementById('foodcourtMessage').innerHTML = `⏰ съесть картошку раз в 3 минуты. осталось ${minutes} мин.`;
+        if (now < gameState.eatCooldown) {
+            const m = Math.ceil((gameState.eatCooldown - now) / 60000);
+            document.getElementById('foodcourtMessage').innerHTML = langData[currentLang].cooldownEat(m);
             return;
         }
-        game.clickPower++;
-        document.getElementById('foodcourtMessage').innerHTML = `🍟 вкусно! сила клика +1 (теперь ${game.clickPower})`;
-        game.eatCooldown = now + 3 * 60 * 1000;
+        gameState.clickPower++;
+        document.getElementById('foodcourtMessage').innerHTML = langData[currentLang].eatMsg(gameState.clickPower);
+        gameState.eatCooldown = now + 3 * 60 * 1000;
         updateUI();
         saveGame();
     }
 
-    // Темы
-    function setTheme(theme) {
-        const body = document.body;
-        if (theme === 'emerald') body.style.background = 'linear-gradient(135deg, #c6f7d0, #2ecc71)';
-        if (theme === 'yellow') body.style.background = 'linear-gradient(135deg, #ffecd2, #fcb69f)';
-        if (theme === 'blue') body.style.background = 'linear-gradient(135deg, #d4e4ff, #a0c4ff)';
-        localStorage.setItem('gameTheme', theme);
+    // Переключение слайдов по круглишкам
+    const container = document.getElementById('scrollContainer');
+    const indicators = document.querySelectorAll('.indicator');
+    function goToSlide(index) {
+        container.scrollTo({ left: index * container.clientWidth, behavior: 'smooth' });
+        indicators.forEach((dot, i) => dot.classList.toggle('active', i === index));
     }
+    indicators.forEach((dot, idx) => {
+        dot.addEventListener('click', () => goToSlide(idx));
+    });
+    container.addEventListener('scroll', () => {
+        const idx = Math.round(container.scrollLeft / container.clientWidth);
+        indicators.forEach((dot, i) => dot.classList.toggle('active', i === idx));
+    });
 
-    function loadTheme() {
-        const theme = localStorage.getItem('gameTheme') || 'emerald';
-        setTheme(theme);
-    }
-
-    // Партиклы вкл/выкл
-    function setParticles(enabled) {
-        game.particlesEnabled = enabled;
+    // Старт
+    document.getElementById('startGameBtn').onclick = () => {
+        let nick = document.getElementById('regUsername').value.trim();
+        if (!nick) nick = "Аноним";
+        currentUser = nick;
+        if (!playersDB[currentUser]) playersDB[currentUser] = { username: currentUser, totalFriesEarned: 0, lastFries: 0 };
+        else gameState.fries = playersDB[currentUser].lastFries || 0;
+        loadExt();
+        updateUI();
+        updateLeaderboard();
+        lastTimestamp = Date.now();
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(() => { updatePassive(); saveGame(); }, 500);
+        document.getElementById('splashScreen').style.display = 'none';
+        document.getElementById('scrollContainer').style.display = 'block';
+        document.getElementById('indicators').style.display = 'flex';
         saveGame();
-    }
+    };
 
-    // ---------- ЗАПУСК ----------
     window.onload = () => {
-        loadGame();
-        loadTheme();
-        updateUI();
-
-        document.getElementById('clickArea').onclick = clickHandler;
-        document.getElementById('upgradeClickBtn').onclick = upgradeClick;
-        document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
-        document.getElementById('telegramBtn').onclick = () => window.open('https://t.me/hioly3', '_blank');
-
-        // Эффекты
-        const effectBtns = document.querySelectorAll('.buyEffectBtn');
-        const effects = ['crown', 'fries', 'dollar'];
-        const prices = [200, 400, 500];
-        effectBtns.forEach((btn, idx) => {
-            btn.onclick = () => buyEffect(effects[idx], prices[idx]);
-        });
-
-        // Фудкорт
-        document.getElementById('jokeBtn').onclick = makeJoke;
-        document.getElementById('eatBtn').onclick = eatFries;
-
-        // Настройки
-        document.getElementById('themeEmerald').onclick = () => setTheme('emerald');
-        document.getElementById('themeYellow').onclick = () => setTheme('yellow');
-        document.getElementById('themeBlue').onclick = () => setTheme('blue');
-        document.getElementById('particlesOn').onclick = () => setParticles(true);
-        document.getElementById('particlesOff').onclick = () => setParticles(false);
+        setTimeout(() => {
+            document.getElementById('clickArea').onclick = clickHandler;
+            document.getElementById('upgradeClickBtn').onclick = buyClickUpgrade;
+            document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
+            document.getElementById('buyX2Btn').onclick = () => buyBooster('x2');
+            document.getElementById('buyX3Btn').onclick = () => buyBooster('x3');
+            document.getElementById('boostAutoBtn').onclick = () => buyBooster('boostAuto');
+            document.getElementById('buyFriesEffect').onclick = buyFriesEffect;
+            document.getElementById('jokeBtn').onclick = makeJoke;
+            document.getElementById('eatBtn').onclick = eatFries;
+            document.getElementById('langRu').onclick = () => { currentLang = 'ru'; applyLanguage(); saveGame(); };
+            document.getElementById('langEn').onclick = () => { currentLang = 'en'; applyLanguage(); saveGame(); };
+            document.getElementById('soundOn').onclick = () => { gameState.soundEnabled = true; saveGame(); };
+            document.getElementById('soundOff').onclick = () => { gameState.soundEnabled = false; saveGame(); };
+            document.getElementById('telegramBtn').onclick = () => window.open('https://t.me/hioly3', '_blank');
+        }, 100);
     };
 </script>
 </body>
