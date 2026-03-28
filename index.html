@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Картошечный Скандал</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#fcb69f">
+    <meta name="theme-color" content="#2ecc71">
     <style>
         * {
             margin: 0;
@@ -16,8 +16,9 @@
         }
 
         body {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #c6f7d0, #2ecc71);
+            transition: background 0.3s;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,27 +29,33 @@
             height: 100%;
         }
 
-        .app-container {
+        /* Контейнер с горизонтальным скроллом */
+        .scroll-container {
             width: 100%;
             max-width: 500px;
             height: 100vh;
-            background: rgba(255, 255, 255, 0.94);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            vertical-align: top;
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
             overflow-y: auto;
-            position: relative;
-        }
-
-        .screen {
             padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            white-space: normal;
         }
-        .hidden { display: none; }
 
-        /* Главный экран */
+        /* Тапалка */
         .fries-image {
             text-align: center;
             margin: 20px 0;
@@ -71,37 +78,30 @@
             font-weight: bold;
         }
 
-        .main-menu {
+        /* Улучшение клика */
+        .upgrade-item {
+            background: white;
+            margin: 12px 0;
+            padding: 15px;
+            border-radius: 28px;
             display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
         }
-        .menu-btn {
-            background: #fff;
+
+        button {
+            background: #34c759;
             border: none;
-            padding: 12px;
+            padding: 8px 20px;
             border-radius: 40px;
             font-weight: 600;
-            flex: 1;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            cursor: pointer;
-        }
-        .menu-btn:active { transform: scale(0.97); }
-
-        .telegram-link {
-            background: #0088cc;
             color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: 40px;
-            margin-top: 20px;
             cursor: pointer;
         }
+        button:active { transform: scale(0.96); }
 
-        /* Магазин */
-        .shop-item {
+        /* Магазин, фудкорт, настройки */
+        .shop-item, .setting-item, .food-item {
             background: white;
             margin: 12px 0;
             padding: 15px;
@@ -114,24 +114,29 @@
             font-size: 24px;
             margin-right: 10px;
         }
-        button {
-            background: #34c759;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
+        h2 { margin-bottom: 15px; }
+        .telegram-link {
+            background: #0088cc;
             color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            margin-top: 20px;
             cursor: pointer;
         }
-        button:active { transform: scale(0.96); }
-
-        h2 { margin-bottom: 15px; }
+        .message-area {
+            background: #e9ecef;
+            padding: 12px;
+            border-radius: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <!-- Главный экран -->
-    <div id="mainScreen" class="screen">
+<div class="scroll-container">
+    <!-- Слайд 0: тапалка -->
+    <div class="slide">
         <div class="fries-image">
             <span id="clickArea">🍟</span>
         </div>
@@ -141,16 +146,15 @@
             <span>⚡ <span id="clicksPerSec">0</span>/сек</span>
             <span>💪 +<span id="clickPower">1</span></span>
         </div>
-        <div class="main-menu">
-            <button class="menu-btn" id="openShopBtn">🛒 магазин</button>
-            <button class="menu-btn" id="openFoodcourtBtn">🍽️ фудкорт</button>
-            <button class="menu-btn" id="openSettingsBtn">⚙️ настройки</button>
+        <div class="upgrade-item">
+            <div>➕ улучшить клик<br>💪 +1 к силе</div>
+            <button id="upgradeClickBtn">🍟 <span id="clickUpgradeCost">10</span></button>
         </div>
         <div class="telegram-link" id="telegramBtn">📱 наш Telegram канал</div>
     </div>
 
-    <!-- Магазин (второй экран) -->
-    <div id="shopScreen" class="screen hidden">
+    <!-- Слайд 1: магазин -->
+    <div class="slide">
         <h2>🛍️ магазин</h2>
         <div class="shop-item" data-effect="crown">
             <div><span class="effect-badge">👑</span> летающие короны</div>
@@ -165,39 +169,43 @@
             <button class="buyEffectBtn">🍟 500</button>
         </div>
         <div class="shop-item">
-            <div>🤖 автокликер<br>📈 уровень <span id="autoLevel">0</span> → +<span id="autoIncome">0</span>/сек</div>
+            <div>🤖 автокликер (раз в 10 мин)<br>📈 уровень <span id="autoLevel">0</span> → <span id="autoIncome">0</span> 🍟</div>
             <button id="buyAutoBtn">🍟 <span id="autoCost">50</span></button>
         </div>
-        <button id="backFromShop" class="menu-btn" style="margin-top:20px">← назад</button>
     </div>
 
-    <!-- Фудкорт (заглушка) -->
-    <div id="foodcourtScreen" class="screen hidden">
+    <!-- Слайд 2: фудкорт -->
+    <div class="slide">
         <h2>🍽️ фудкорт</h2>
-        <div class="shop-item">
+        <div class="food-item">
             <div>😂 смешно пошутить (раз в день)</div>
             <button id="jokeBtn">+250🍟</button>
         </div>
-        <div class="shop-item">
-            <div>🍟 съесть картошку (раз в 3 минуты)</div>
+        <div class="food-item">
+            <div>🍟 съесть картошку (раз в 3 мин)</div>
             <button id="eatBtn">+1💪</button>
         </div>
-        <div id="foodcourtMessage" class="stats" style="margin-top:15px">нажми на кнопку</div>
-        <button id="backFromFoodcourt" class="menu-btn" style="margin-top:20px">← назад</button>
+        <div id="foodcourtMessage" class="message-area">нажми на кнопку</div>
     </div>
 
-    <!-- Настройки (заглушка) -->
-    <div id="settingsScreen" class="screen hidden">
+    <!-- Слайд 3: настройки -->
+    <div class="slide">
         <h2>⚙️ настройки</h2>
-        <div class="shop-item">
+        <div class="setting-item">
             <span>🎨 тема</span>
             <div>
+                <button id="themeEmerald">изумрудная</button>
                 <button id="themeYellow">жёлтая</button>
-                <button id="themeGreen">зелёная</button>
                 <button id="themeBlue">голубая</button>
             </div>
         </div>
-        <button id="backFromSettings" class="menu-btn" style="margin-top:20px">← назад</button>
+        <div class="setting-item">
+            <span>✨ партиклы</span>
+            <div>
+                <button id="particlesOn">вкл</button>
+                <button id="particlesOff">выкл</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -207,37 +215,37 @@
         fries: 100,
         premium: 0,
         clickPower: 1,
+        clickUpgradeLevel: 0,
         autoLevel: 0,
-        autoIncome: 0,
-        lastTimestamp: Date.now(),
-        lastClickSound: 0,
-        effects: {
-            crown: false,
-            fries: false,
-            dollar: false
-        },
+        autoIncomeValue: 0,
+        lastAutoTime: 0,
+        effects: { crown: false, fries: false, dollar: false },
+        particlesEnabled: true,
         jokeCooldown: 0,
         eatCooldown: 0
     };
 
-    // Прогрессия автокликера: 1 → 5 → 10 → 40
+    const upgradeCostBase = 10;
     const autoIncomeMap = [0, 1, 5, 10, 40];
-    function updateAutoIncome() {
-        game.autoIncome = autoIncomeMap[game.autoLevel] || 40;
-        document.getElementById('autoIncome').innerText = game.autoIncome;
-        document.getElementById('clicksPerSec').innerText = game.autoIncome;
-        document.getElementById('autoLevel').innerText = game.autoLevel;
+    const autoCostBase = 50;
+
+    function getClickUpgradeCost() {
+        return Math.floor(upgradeCostBase * Math.pow(1.6, game.clickUpgradeLevel));
     }
 
     function getAutoCost() {
-        return Math.floor(50 * Math.pow(1.8, game.autoLevel));
+        return Math.floor(autoCostBase * Math.pow(1.8, game.autoLevel));
     }
 
     function updateUI() {
         document.getElementById('fries').innerText = Math.floor(game.fries);
         document.getElementById('premium').innerText = Math.floor(game.premium);
         document.getElementById('clickPower').innerText = game.clickPower;
+        document.getElementById('clickUpgradeCost').innerText = getClickUpgradeCost();
+        document.getElementById('autoLevel').innerText = game.autoLevel;
+        document.getElementById('autoIncome').innerText = autoIncomeMap[game.autoLevel] || 40;
         document.getElementById('autoCost').innerText = getAutoCost();
+        document.getElementById('clicksPerSec').innerText = 'авто';
     }
 
     function saveGame() {
@@ -250,28 +258,79 @@
             try {
                 const data = JSON.parse(saved);
                 game = { ...game, ...data };
-                updateAutoIncome();
+                if (!game.autoLevel) game.autoLevel = 0;
+                if (!game.effects) game.effects = { crown: false, fries: false, dollar: false };
             } catch(e) {}
         }
         updateUI();
     }
 
-    // Пассивный доход
-    function updatePassiveIncome() {
+    // Автокликер раз в 10 минут
+    function checkAutoClicker() {
         const now = Date.now();
-        const delta = Math.min(0.5, (now - game.lastTimestamp) / 1000);
-        if (delta > 0 && game.autoIncome > 0) {
-            game.fries += game.autoIncome * delta;
+        if (game.autoLevel > 0 && (now - game.lastAutoTime) >= 10 * 60 * 1000) {
+            let reward = autoIncomeMap[game.autoLevel] || 40;
+            game.fries += reward;
+            game.lastAutoTime = now;
             updateUI();
+            saveGame();
+            showFloatingText(`🤖 автокликер: +${reward} 🍟`);
         }
-        game.lastTimestamp = now;
+    }
+    setInterval(checkAutoClicker, 1000);
+
+    function showFloatingText(text) {
+        const div = document.createElement('div');
+        div.innerText = text;
+        div.style.position = 'fixed';
+        div.style.bottom = '30%';
+        div.style.left = '50%';
+        div.style.transform = 'translateX(-50%)';
+        div.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        div.style.color = 'white';
+        div.style.padding = '8px 16px';
+        div.style.borderRadius = '40px';
+        div.style.fontSize = '14px';
+        div.style.zIndex = '9999';
+        div.style.whiteSpace = 'nowrap';
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 1500);
     }
 
-    // Звук с таймаутом 1 сек
+    // Партиклы
+    function spawnParticles() {
+        if (!game.particlesEnabled) return;
+        const active = [];
+        if (game.effects.crown) active.push('👑');
+        if (game.effects.fries) active.push('🍟');
+        if (game.effects.dollar) active.push('💵');
+        if (active.length === 0) return;
+
+        const effect = active[Math.floor(Math.random() * active.length)];
+        const particle = document.createElement('div');
+        particle.innerText = effect;
+        particle.style.position = 'fixed';
+        particle.style.left = Math.random() * window.innerWidth + 'px';
+        particle.style.bottom = '60px';
+        particle.style.fontSize = '28px';
+        particle.style.opacity = '0.5';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '9999';
+        particle.style.transition = 'all 1s ease-out';
+        document.body.appendChild(particle);
+        requestAnimationFrame(() => {
+            particle.style.transform = 'translateY(-200px)';
+            particle.style.opacity = '0';
+        });
+        setTimeout(() => particle.remove(), 1000);
+    }
+
+    // Звук с таймаутом
+    let lastSound = 0;
     function playClickSound() {
         const now = Date.now();
-        if (now - game.lastClickSound < 1000) return;
-        game.lastClickSound = now;
+        if (now - lastSound < 1000) return;
+        lastSound = now;
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
@@ -287,33 +346,7 @@
         } catch(e) {}
     }
 
-    // Партиклы эффектов
-    function spawnParticles() {
-        const activeEffects = [];
-        if (game.effects.crown) activeEffects.push('👑');
-        if (game.effects.fries) activeEffects.push('🍟');
-        if (game.effects.dollar) activeEffects.push('💵');
-        if (activeEffects.length === 0) return;
-
-        const effect = activeEffects[Math.floor(Math.random() * activeEffects.length)];
-        const particle = document.createElement('div');
-        particle.innerText = effect;
-        particle.style.position = 'fixed';
-        particle.style.left = Math.random() * window.innerWidth + 'px';
-        particle.style.bottom = '60px';
-        particle.style.fontSize = '28px';
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '9999';
-        particle.style.transition = 'all 0.8s ease-out';
-        document.body.appendChild(particle);
-        requestAnimationFrame(() => {
-            particle.style.transform = 'translateY(-180px)';
-            particle.style.opacity = '0';
-        });
-        setTimeout(() => particle.remove(), 800);
-    }
-
-    // Клик по картошке
+    // Клик
     function clickHandler() {
         let gain = game.clickPower;
         game.fries += gain;
@@ -325,33 +358,42 @@
         saveGame();
     }
 
-    // ---------- МАГАЗИН ----------
+    // Улучшение клика
+    function upgradeClick() {
+        let cost = getClickUpgradeCost();
+        if (game.fries >= cost) {
+            game.fries -= cost;
+            game.clickUpgradeLevel++;
+            game.clickPower = 1 + game.clickUpgradeLevel;
+            updateUI();
+            saveGame();
+        } else alert("Не хватает картошек!");
+    }
+
+    // Покупка эффектов
     function buyEffect(effectName, price) {
         if (game.fries >= price) {
             game.fries -= price;
             game.effects[effectName] = true;
-            alert(`Эффект ${effectName} активирован!`);
+            alert(`Эффект ${effectName} куплен!`);
             updateUI();
             saveGame();
-        } else {
-            alert("Не хватает картошек!");
-        }
+        } else alert("Не хватает картошек!");
     }
 
+    // Покупка автокликера
     function buyAutoClicker() {
         let cost = getAutoCost();
         if (game.fries >= cost) {
             game.fries -= cost;
             if (game.autoLevel < 4) game.autoLevel++;
-            updateAutoIncome();
             updateUI();
             saveGame();
-        } else {
-            alert("Не хватает картошек!");
-        }
+            if (game.autoLevel === 1) game.lastAutoTime = Date.now();
+        } else alert("Не хватает картошек!");
     }
 
-    // ---------- ФУДКОРТ ----------
+    // Фудкорт
     function makeJoke() {
         const now = Date.now();
         if (now < game.jokeCooldown) {
@@ -385,48 +427,38 @@
         saveGame();
     }
 
-    // ---------- НАСТРОЙКИ ТЕМ ----------
+    // Темы
     function setTheme(theme) {
         const body = document.body;
-        if (theme === 'yellow') body.style.background = 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
-        if (theme === 'green') body.style.background = 'linear-gradient(135deg, #e4f5d4 0%, #b8e1a0 100%)';
-        if (theme === 'blue') body.style.background = 'linear-gradient(135deg, #d4e4ff 0%, #a0c4ff 100%)';
+        if (theme === 'emerald') body.style.background = 'linear-gradient(135deg, #c6f7d0, #2ecc71)';
+        if (theme === 'yellow') body.style.background = 'linear-gradient(135deg, #ffecd2, #fcb69f)';
+        if (theme === 'blue') body.style.background = 'linear-gradient(135deg, #d4e4ff, #a0c4ff)';
         localStorage.setItem('gameTheme', theme);
     }
 
     function loadTheme() {
-        const theme = localStorage.getItem('gameTheme');
-        if (theme) setTheme(theme);
+        const theme = localStorage.getItem('gameTheme') || 'emerald';
+        setTheme(theme);
     }
 
-    // ---------- НАВИГАЦИЯ ----------
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-        document.getElementById(screenId).classList.remove('hidden');
+    // Партиклы вкл/выкл
+    function setParticles(enabled) {
+        game.particlesEnabled = enabled;
+        saveGame();
     }
 
-    // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+    // ---------- ЗАПУСК ----------
     window.onload = () => {
         loadGame();
         loadTheme();
-        updateAutoIncome();
         updateUI();
 
-        setInterval(() => {
-            updatePassiveIncome();
-            saveGame();
-        }, 500);
-
-        // Главный экран
         document.getElementById('clickArea').onclick = clickHandler;
-        document.getElementById('openShopBtn').onclick = () => showScreen('shopScreen');
-        document.getElementById('openFoodcourtBtn').onclick = () => showScreen('foodcourtScreen');
-        document.getElementById('openSettingsBtn').onclick = () => showScreen('settingsScreen');
+        document.getElementById('upgradeClickBtn').onclick = upgradeClick;
+        document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
         document.getElementById('telegramBtn').onclick = () => window.open('https://t.me/hioly3', '_blank');
 
-        // Магазин
-        document.getElementById('backFromShop').onclick = () => showScreen('mainScreen');
-        document.getElementById('buyAutoBtn').onclick = buyAutoClicker;
+        // Эффекты
         const effectBtns = document.querySelectorAll('.buyEffectBtn');
         const effects = ['crown', 'fries', 'dollar'];
         const prices = [200, 400, 500];
@@ -435,15 +467,15 @@
         });
 
         // Фудкорт
-        document.getElementById('backFromFoodcourt').onclick = () => showScreen('mainScreen');
         document.getElementById('jokeBtn').onclick = makeJoke;
         document.getElementById('eatBtn').onclick = eatFries;
 
         // Настройки
-        document.getElementById('backFromSettings').onclick = () => showScreen('mainScreen');
+        document.getElementById('themeEmerald').onclick = () => setTheme('emerald');
         document.getElementById('themeYellow').onclick = () => setTheme('yellow');
-        document.getElementById('themeGreen').onclick = () => setTheme('green');
         document.getElementById('themeBlue').onclick = () => setTheme('blue');
+        document.getElementById('particlesOn').onclick = () => setParticles(true);
+        document.getElementById('particlesOff').onclick = () => setParticles(false);
     };
 </script>
 </body>
