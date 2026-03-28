@@ -14,22 +14,22 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+        }
         body {
             background: #000000;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
         }
-        /* принудительная вертикальная ориентация */
-        @media (orientation: landscape) {
+        @media screen and (orientation: landscape) {
             body {
-                transform: rotate(0deg);
+                transform: rotate(0deg) !important;
             }
         }
         .splash-screen {
@@ -309,7 +309,7 @@
 </div>
 
 <script>
-    // ПОЛНАЯ ЛОКАЛИЗАЦИЯ
+    // ПОЛНАЯ ЛОКАЛИЗАЦИЯ — все тексты
     const langData = {
         ru: {
             charName: "Настикс", charQuote: "— «одна фри на десятерых!»", perClick: "за тык",
@@ -323,7 +323,8 @@
             eatMsg: (power) => `🍟 вкусно! сила клика +1 (теперь ${power})`,
             cooldownJoke: (h) => `⏰ шутить раз в день. осталось ~${h} ч.`,
             cooldownEat: (m) => `⏰ съесть картошку раз в 3 минуты. осталось ${m} мин.`,
-            effectBought: "🍟 эффект летающих картошек куплен!"
+            effectBought: "🍟 эффект летающих картошек куплен!",
+            notEnough: "Не хватает картошек!"
         },
         en: {
             charName: "Nastix", charQuote: "— one fries for ten people!", perClick: "per tap",
@@ -337,7 +338,8 @@
             eatMsg: (power) => `🍟 tasty! click power +1 (now ${power})`,
             cooldownJoke: (h) => `⏰ joke once a day. ${h} hours left.`,
             cooldownEat: (m) => `⏰ eat fries once per 3 min. ${m} min left.`,
-            effectBought: "🍟 flying fries effect purchased!"
+            effectBought: "🍟 flying fries effect purchased!",
+            notEnough: "Not enough fries!"
         }
     };
     let currentLang = 'ru';
@@ -357,8 +359,10 @@
     };
     let upgradeCostBase = 10, autoCostBase = 50, lastTimestamp = Date.now(), intervalId = null;
 
+    // функция обновления ВСЕХ текстов на экране
     function applyLanguage() {
         const d = langData[currentLang];
+        // первый слайд
         document.getElementById('charName').innerText = d.charName;
         document.getElementById('charQuote').innerText = d.charQuote;
         document.getElementById('perClickText').innerText = d.perClick;
@@ -371,6 +375,7 @@
         document.getElementById('booster3xTitle').innerHTML = d.booster3x;
         document.getElementById('boostAutoTitle').innerHTML = d.boostAuto;
         document.getElementById('topTitle').innerText = d.top;
+        // второй слайд
         document.getElementById('shopTitle').innerText = d.shop;
         document.getElementById('friesEffectTitle').innerHTML = d.friesEffect;
         document.getElementById('foodcourtTitle').innerText = d.foodcourt;
@@ -489,7 +494,7 @@
             gameState.clickPower = 1 + gameState.clickUpgradeLevel * 0.5;
             updateUI();
             saveGame();
-        } else alert(langData[currentLang].notEnough || "Не хватает картошки!");
+        } else alert(langData[currentLang].notEnough);
     }
 
     function buyAutoClicker() {
@@ -500,7 +505,7 @@
             gameState.autoIncome = gameState.autoUpgradeCount;
             updateUI();
             saveGame();
-        } else alert(langData[currentLang].notEnough || "Не хватает картошки!");
+        } else alert(langData[currentLang].notEnough);
     }
 
     function buyBooster(type) {
@@ -516,7 +521,7 @@
             gameState.fries -= 150;
             gameState.autoMultiplier = 2;
             gameState.autoMultEndTime = Date.now() + 30000;
-        } else { alert(langData[currentLang].notEnough || "Не хватает картошек!"); return; }
+        } else { alert(langData[currentLang].notEnough); return; }
         updateUI();
         saveGame();
     }
@@ -528,7 +533,7 @@
             alert(langData[currentLang].effectBought);
             updateUI();
             saveGame();
-        } else alert(langData[currentLang].notEnough || "Не хватает картошек!");
+        } else alert(langData[currentLang].notEnough);
     }
 
     function makeJoke() {
